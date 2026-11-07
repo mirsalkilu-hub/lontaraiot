@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import SiteFooter from "./site-footer";
+import SiteHeader from "./site-header";
 
 const values = [
   { number: "01", title: "Pembelajaran", description: "Belajar dengan praktik, eksplorasi, dan rasa ingin tahu." },
@@ -84,9 +86,6 @@ function NewsSection({ news, error }) {
 }
 
 export default function HomePage({ news, newsError }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const closeMenu = () => setMenuOpen(false);
-
   useEffect(() => {
     const root = document.documentElement;
     root.classList.add("motion-ready");
@@ -135,14 +134,7 @@ export default function HomePage({ news, newsError }) {
   return (
     <>
       <div className="scroll-progress" aria-hidden="true" />
-      <header className="site-header">
-        <a className="brand" href="#" aria-label="LontaraIoT beranda"><img className="brand-logo" src="/lontara-logo.png" alt="Lontara IoT & Robotics Bootcamp" /></a>
-        <button className="menu-toggle" type="button" aria-label={menuOpen ? "Tutup menu" : "Buka menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}><span /><span /></button>
-        <nav className={menuOpen ? "main-nav nav-open" : "main-nav"} aria-label="Navigasi utama">
-          <a href="#tentang" onClick={closeMenu}>Tentang</a><a href="#program" onClick={closeMenu}>Program</a><a href="#berita" onClick={closeMenu}>Berita</a>
-          <a className="nav-cta" href="#kontak" onClick={closeMenu}>Mulai jelajah <ArrowIcon /></a>
-        </nav>
-      </header>
+      <SiteHeader home />
 
       <main>
         <section className="hero">
@@ -177,10 +169,7 @@ export default function HomePage({ news, newsError }) {
         <section className="contact-banner" id="kontak" data-reveal="up"><div className="contact-star">✳</div><div><p className="eyebrow"><span className="eyebrow-line" /> MASA DEPAN DIMULAI DARI SINI</p><h2>Punya ide? Ayo<br /><span>wujudkan bersama.</span></h2></div><a className="button button-light" href="mailto:hello@lontaraiot.id">Hubungi kami <ArrowIcon /></a><div className="contact-orbit" /></section>
       </main>
 
-      <footer className="site-footer">
-        <div className="footer-main" data-reveal="up"><div className="footer-about"><a className="brand brand-footer" href="#" aria-label="LontaraIoT beranda"><img className="brand-logo" src="/lontara-logo.png" alt="Lontara IoT & Robotics Bootcamp" /></a><p>Berakar pada kearifan,<br />bergerak dengan inovasi,<br />menuju masa depan.</p></div><div className="footer-column"><span className="footer-label">JELAJAHI</span><a href="#tentang">Tentang kami</a><a href="#program">Program belajar</a><a href="#berita">Kabar terbaru</a></div><div className="footer-column"><span className="footer-label">TERHUBUNG</span><a href="mailto:hello@lontaraiot.id">hello@lontaraiot.id</a><a href="#kontak">Makassar, Indonesia</a><a href="/admin">Admin</a></div><div className="footer-note"><span>✳</span><p>Teknologi untuk<br />masa depan yang<br /><strong>berkelanjutan.</strong></p></div></div>
-        <div className="footer-bottom" data-reveal="up"><span>© {new Date().getFullYear()} LontaraIoT. Belajar, berkarya, bertumbuh.</span><span>DIBUAT DENGAN RASA INGIN TAHU <span className="pulse-dot" /></span></div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

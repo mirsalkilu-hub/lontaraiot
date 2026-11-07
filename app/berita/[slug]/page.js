@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getNewsBySlug } from "../../../lib/supabase/news";
+import SiteFooter from "../../ui/site-footer";
+import SiteHeader from "../../ui/site-header";
 
 export const dynamic = "force-dynamic";
 
@@ -43,12 +45,7 @@ export default async function NewsArticlePage({ params }) {
 
   return (
     <main className="article-page">
-      <header className="article-header">
-        <Link className="brand" href="/" aria-label="LontaraIoT beranda">
-          <img className="brand-logo" src="/lontara-logo.png" alt="Lontara IoT & Robotics Bootcamp" />
-        </Link>
-        <Link className="article-back" href="/#berita">← Semua berita</Link>
-      </header>
+      <SiteHeader />
       <article className="article-content">
         <Link className="article-back article-back-mobile" href="/#berita">← Semua berita</Link>
         <div className="article-heading">
@@ -64,7 +61,7 @@ export default async function NewsArticlePage({ params }) {
         </div>
         <Link className="text-link article-return" href="/#berita">Kembali ke semua berita <span aria-hidden="true">↗</span></Link>
       </article>
-      <footer className="article-footer">© {new Date().getFullYear()} LontaraIoT · Belajar, berkarya, bertumbuh.</footer>
+      <SiteFooter />
     </main>
   );
 }
