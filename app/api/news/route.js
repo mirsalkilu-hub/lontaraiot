@@ -2,11 +2,9 @@ import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getAdminSupabase } from "../../../lib/supabase/server";
 import { getNews, imageBucket } from "../../../lib/supabase/news";
-import { publishToSocialMedia } from "../../../lib/meta/publish";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
 const maxImageSize = 5 * 1024 * 1024;
 const allowedImages = new Map([
   ["image/jpeg", "jpg"],
@@ -114,24 +112,7 @@ export async function POST(request) {
     postInserted = true;
 
     const news = await getNews();
-    let social;
-    try {
-      social = await publishToSocialMedia({
-        post,
-        supabase,
-        imageBucket,
-        imagePath,
-        imageBytes,
-      });
-    } catch (error) {
-      console.error("Unable to publish LontaraIoT news to social media:", error);
-      social = {
-        configured: true,
-        facebook: { status: "failed", error: "Terjadi kesalahan saat menghubungi Meta." },
-        instagram: { status: "failed", error: "Terjadi kesalahan saat menghubungi Meta." },
-      };
-    }
-    return NextResponse.json({ news, social }, { status: 201 });
+    return NextResponse.json(news, { status: 201 });
   } catch (error) {
     console.error("Unable to publish Supabase news:", error);
     if (!postInserted && imagePath) {
