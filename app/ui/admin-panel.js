@@ -18,6 +18,7 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [warning, setWarning] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -99,6 +100,7 @@ export default function AdminPanel() {
     event.preventDefault();
     setError("");
     setMessage("");
+    setWarning("");
     setSaving(true);
     try {
       const formData = new FormData();
@@ -110,11 +112,24 @@ export default function AdminPanel() {
         setError(data.error || "Berita gagal disimpan.");
         return;
       }
-      setNews(data);
+      setNews(data.news);
       setForm({ ...blankNews, date: new Date().toISOString().slice(0, 10) });
       setImageFile(null);
       setImagePreview("");
-      setMessage("Berita berhasil diterbitkan dan tampil di halaman utama.");
+      const social = data.social;
+      if (!social?.configured) {
+        setWarning("Berita terbit di website, tetapi autopost Meta belum dikonfigurasi.");
+      } else {
+        const platformStatus = (name, result) => {
+          if (result.status === "published") return `${name} berhasil`;
+          if (result.status === "skipped") return `${name} dilewati`;
+          return `${name} gagal${result.error ? `: ${result.error}` : ""}`;
+        };
+        const results = [platformStatus("Facebook", social.facebook), platformStatus("Instagram", social.instagram)];
+        const failed = [social.facebook, social.instagram].some((result) => result.status === "failed");
+        if (failed) setWarning(`Berita terbit di website. ${results.join("; ")}.`);
+        else setMessage(`Berita terbit di website. ${results.join("; ")}.`);
+      }
     } catch {
       setError("Berita gagal disimpan. Periksa koneksi lalu coba kembali.");
     } finally {
@@ -168,7 +183,7 @@ export default function AdminPanel() {
             <div className="admin-news-list"><h2>Berita terbit ({news.length})</h2>{news.map((item) => <article className="admin-news-item" key={item.id}>{item.imageUrl && <img className="admin-news-thumb" src={item.imageUrl} alt="" />}<div><span>{item.category} · {item.date}</span><h3>{item.title}</h3></div><button onClick={() => deleteNews(item.id)} aria-label={`Hapus ${item.title}`}>Hapus</button></article>)}</div>
           </div>
         )}
-        {error && <p className="admin-alert" role="alert">{error}</p>}{message && <p className="admin-success" role="status">{message}</p>}
+        {error && <p className="admin-alert" role="alert">{error}</p>}{warning && <p className="admin-alert" role="status">{warning}</p>}{message && <p className="admin-success" role="status">{message}</p>}
       </section>
       <footer className="admin-footer">LontaraIoT · Admin portal <span><span className="pulse-dot" /> SECURE SESSION</span></footer>
     </main>

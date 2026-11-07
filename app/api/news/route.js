@@ -2,9 +2,11 @@ import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getAdminSupabase } from "../../../lib/supabase/server";
 import { getNews, imageBucket } from "../../../lib/supabase/news";
+import { publishToSocialMedia } from "../../../lib/meta/publish";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 const maxImageSize = 5 * 1024 * 1024;
 const allowedImages = new Map([
   ["image/jpeg", "jpg"],
@@ -80,23 +82,24 @@ export async function POST(request) {
 
   const supabase = auth.supabase;
   let imagePath = null;
+  let postInserted = false;
+  let imageBytes = null;
   try {
     if (image?.size) {
-      const bytes = Buffer.from(await image.arrayBuffer());
-      const detectedType = identifyImage(bytes);
+      imageBytes = Buffer.from(await image.arrayBuffer());
+      const detectedType = identifyImage(imageBytes);
       if (!detectedType || detectedType !== image.type || !allowedImages.has(detectedType)) {
         return errorResponse("Format gambar harus JPEG, PNG, atau WebP yang valid.", 400);
       }
-
       imagePath = `${randomUUID()}.${allowedImages.get(detectedType)}`;
       const { error } = await supabase.storage
         .from(imageBucket)
-        .upload(imagePath, bytes, { contentType: detectedType, upsert: false });
+        .upload(imagePath, imageBytes, { contentType: detectedType, upsert: false });
       if (error) throw error;
     }
 
     const slug = `${slugify(title)}-${randomUUID().slice(0, 8)}`;
-    const { error } = await supabase.from("posts").insert({
+    const post = {
       slug,
       title: title.trim(),
       category,
@@ -105,17 +108,39 @@ export async function POST(request) {
       published_at: date,
       image_path: imagePath,
       author_id: auth.user.id,
-    });
+    };
+    const { error } = await supabase.from("posts").insert(post);
     if (error) throw error;
+    postInserted = true;
 
-    return NextResponse.json(await getNews(), { status: 201 });
+    const news = await getNews();
+    let social;
+    try {
+      social = await publishToSocialMedia({
+        post,
+        supabase,
+        imageBucket,
+        imagePath,
+        imageBytes,
+      });
+    } catch (error) {
+      console.error("Unable to publish LontaraIoT news to social media:", error);
+      social = {
+        configured: true,
+        facebook: { status: "failed", error: "Terjadi kesalahan saat menghubungi Meta." },
+        instagram: { status: "failed", error: "Terjadi kesalahan saat menghubungi Meta." },
+      };
+    }
+    return NextResponse.json({ news, social }, { status: 201 });
   } catch (error) {
     console.error("Unable to publish Supabase news:", error);
-    if (imagePath) {
+    if (!postInserted && imagePath) {
       const { error: cleanupError } = await supabase.storage.from(imageBucket).remove([imagePath]);
       if (cleanupError) console.error("Unable to remove orphaned Supabase image:", cleanupError);
     }
-    return errorResponse("Berita gagal diterbitkan. Periksa tabel dan bucket Supabase.");
+    return postInserted
+      ? errorResponse("Berita sudah tersimpan, tetapi respons gagal dimuat. Muat ulang halaman admin.", 503)
+      : errorResponse("Berita gagal diterbitkan. Periksa tabel dan bucket Supabase.");
   }
 }
 
