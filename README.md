@@ -5,7 +5,7 @@ Website Lontara IoT & Robotic Bootcamps menggunakan Supabase untuk data berita, 
 ### Persiapan Supabase
 
 1. Buat proyek Supabase.
-2. Jalankan `supabase/schema.sql` melalui SQL Editor untuk membuat tabel, indeks, bucket gambar publik, dan kebijakan Row Level Security. Skrip aman dijalankan ulang dan menambahkan kolom `published_at` serta `author_id` jika tabel `posts` lama belum memilikinya. Berita lama tetap dipertahankan; berita yang diterbitkan melalui admin akan mencatat akun penulisnya.
+2. Jalankan `supabase/schema.sql` melalui SQL Editor untuk membuat tabel, indeks, bucket gambar publik, dan kebijakan Row Level Security. Skrip aman dijalankan ulang dan menambahkan kolom `published_at`, `author_id`, serta `created_at` jika tabel `posts` lama belum memilikinya. Berita lama tetap dipertahankan; berita yang diterbitkan melalui admin akan mencatat akun penulisnya.
 3. Buat akun admin melalui **Authentication → Users**. Matikan pendaftaran publik di pengaturan **Authentication → Sign In / Providers**.
 4. Di pengaturan pengguna tersebut, tetapkan **App Metadata** menjadi `{"role":"admin"}`. Jangan gunakan User Metadata untuk peran admin.
 5. Salin `.env.example` menjadi `.env.local`, lalu isi URL proyek dan publishable/anon key dari **Project Settings → API Keys**. Service role key hanya diperlukan untuk migrasi berita lama.

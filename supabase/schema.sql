@@ -17,6 +17,9 @@ alter table public.posts
 alter table public.posts
   add column if not exists author_id uuid references auth.users(id) on delete restrict;
 
+alter table public.posts
+  add column if not exists created_at timestamptz not null default now();
+
 create index if not exists posts_published_at_idx
   on public.posts (published_at desc, created_at desc);
 

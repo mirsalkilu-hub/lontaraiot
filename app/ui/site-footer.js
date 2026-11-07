@@ -16,7 +16,7 @@ export default function SiteFooter() {
         </div>
         <div className="footer-column">
           <span className="footer-label">TERHUBUNG</span>
-          <a href="mailto:hello@lontaraiot.id">hello@lontaraiot.id</a>
+          <a href="mailto:hello@lontaraiot.id">mirsal.kilu@gmail.com</a>
           <a href="/#kontak">Makassar, Indonesia</a>
           <a href="/admin">Admin</a>
           <span className="footer-label footer-social-label">IKUTI KAMI</span>
