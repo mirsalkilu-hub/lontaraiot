@@ -209,6 +209,13 @@ html.motion-ready [data-reveal].is-visible { opacity: 1; translate: 0 0; scale: 
 .footer-about > p { margin: 15px 0 0; color: #526984; font-size: 12px; line-height: 1.8; }
 .footer-column { display: flex; flex-direction: column; align-items: flex-start; gap: 13px; padding-top: 9px; font-size: 11px; color: #35557e; }
 .footer-label { margin-bottom: 7px; color: #6b83a3; font: 9px var(--mono); letter-spacing: .14em; }
+.footer-social-label { margin: 8px 0 -3px; }
+.footer-social-links { display: flex; flex-wrap: wrap; gap: 12px; }
+.footer-social-links a { display: inline-flex; align-items: center; gap: 6px; transition: color .2s; }
+.footer-social-links a:hover { color: #d87e00; }
+.footer-social-links svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.footer-social-links svg .social-icon-dot { fill: currentColor; stroke: none; }
+.footer-social-links a:last-child svg { fill: currentColor; stroke: none; }
 .footer-note { padding-top: 4px; color: #d9850a; }
 .footer-note > span { font-size: 21px; }
 .footer-note p { margin: 10px 0; color: #526984; font: 16px/1.45 var(--display); }

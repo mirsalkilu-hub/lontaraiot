@@ -19,6 +19,17 @@ export default function SiteFooter() {
           <a href="mailto:hello@lontaraiot.id">hello@lontaraiot.id</a>
           <a href="/#kontak">Makassar, Indonesia</a>
           <a href="/admin">Admin</a>
+          <span className="footer-label footer-social-label">IKUTI KAMI</span>
+          <div className="footer-social-links">
+            <a href="https://www.instagram.com/lontaraiot/" target="_blank" rel="noreferrer" aria-label="Instagram LontaraIoT">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle className="social-icon-dot" cx="17.5" cy="6.5" r="1" /></svg>
+              Instagram
+            </a>
+            <a href="https://www.facebook.com/profile.php?id=61596416695058" target="_blank" rel="noreferrer" aria-label="Facebook LontaraIoT">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 21v-8h3l.5-4H14V7c0-1.2.4-2 2-2h1.7V1.4C17 1.2 15.8 1 14.5 1 11.1 1 9 3 9 6.7V9H6v4h3v8z" /></svg>
+              Facebook
+            </a>
+          </div>
         </div>
         <div className="footer-note">
           <span>✳</span>
