@@ -36,6 +36,20 @@ function HeroPoster() {
   );
 }
 
+function PartnerLogos() {
+  return (
+    <div className="hero-partners" aria-label="Mitra pendukung">
+      <span className="footer-label">DIDUKUNG OLEH</span>
+      <div className="hero-partner-logos">
+        <img src="/logo-danantara.webp" alt="Danantara Indonesia" />
+        <img src="/logo-sulawesi-selatan.png" alt="Sulawesi Selatan" />
+        <img src="/logo-bpsdm.png" alt="BPSDM Sulawesi Selatan" />
+        <img src="/logo-telkom-indonesia.png" alt="Telkom Indonesia" />
+      </div>
+    </div>
+  );
+}
+
 function NewsSection({ news, error }) {
   return (
     <section className="section news-section" id="berita">
@@ -117,15 +131,7 @@ export default function HomePage({ news, newsError }) {
             <p className="hero-description">Ruang belajar teknologi yang berakar pada kearifan, bergerak dengan inovasi, dan tumbuh bersama generasi pencipta.</p>
             <div className="hero-actions"><a className="button button-dark" href="#program">Jelajahi program <ArrowIcon /></a><a className="button button-quiet" href="#tentang">Kenali Lontara <span>↓</span></a></div>
             <div className="hero-note"><span className="note-star">✳</span><span>Berakar pada kearifan,<br />bergerak dengan inovasi.</span></div>
-            <div className="hero-partners" aria-label="Mitra pendukung">
-              <span className="footer-label">DIDUKUNG OLEH</span>
-              <div className="hero-partner-logos">
-                <img src="/logo-danantara.webp" alt="Danantara Indonesia" />
-                <img src="/logo-sulawesi-selatan.png" alt="Sulawesi Selatan" />
-                <img src="/logo-bpsdm.png" alt="BPSDM Sulawesi Selatan" />
-                <img src="/logo-telkom-indonesia.png" alt="Telkom Indonesia" />
-              </div>
-            </div>
+            <PartnerLogos />
           </div>
           <div data-reveal="scale"><HeroPoster /></div>
           <div className="hero-foot"><span>01 — BELAJAR DENGAN MEMBUAT</span><span>MAKASSAR, INDONESIA <span className="pulse-dot" /></span></div>
@@ -151,6 +157,9 @@ export default function HomePage({ news, newsError }) {
         <section className="contact-banner" id="kontak" data-reveal="up"><div className="contact-star">✳</div><div><p className="eyebrow"><span className="eyebrow-line" /> MASA DEPAN DIMULAI DARI SINI</p><h2>Punya ide? Ayo<br /><span>wujudkan bersama.</span></h2></div><a className="button button-light" href="mailto:hello@lontaraiot.id">Hubungi kami <ArrowIcon /></a><div className="contact-orbit" /></section>
       </main>
 
+      <div className="mobile-partners">
+        <PartnerLogos />
+      </div>
       <SiteFooter />
     </>
   );
