@@ -24,41 +24,14 @@ function ArrowIcon() {
   return <span aria-hidden="true">↗</span>;
 }
 
-function RobotIllustration() {
+function HeroPoster() {
   return (
-    <div className="hero-art" aria-label="Animasi robot pintar dan teknologi">
-      <div className="art-orbit orbit-one" />
-      <div className="art-orbit orbit-two" />
-      <span className="art-spark spark-one" aria-hidden="true">✳</span>
-      <span className="art-spark spark-two" aria-hidden="true">·</span>
-      <div className="art-grid" />
-      <div className="art-label label-top"><span className="pulse-dot" /> SYSTEM ONLINE</div>
-      <div className="art-label label-bottom">MADE FOR TOMORROW <span>✳</span></div>
-      <svg className="robot-svg" viewBox="0 0 420 450" role="img" aria-labelledby="robot-title robot-description">
-        <title id="robot-title">Robot pintar dengan sensor bercahaya</title>
-        <desc id="robot-description">Robot Lontara bergerak dan berkedip di antara orbit teknologi.</desc>
-        <defs>
-          <linearGradient id="body" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stopColor="#f7f9fd" /><stop offset="1" stopColor="#c6d6e8" /></linearGradient>
-          <linearGradient id="face" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stopColor="#123b72" /><stop offset="1" stopColor="#071d3b" /></linearGradient>
-          <filter id="glow"><feGaussianBlur stdDeviation="7" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
-        </defs>
-        <g className="robot-character">
-        <ellipse cx="215" cy="408" rx="118" ry="17" fill="#15292a" opacity=".14" />
-        <path className="robot-legs" d="M142 292 122 365q-3 15 13 18l31 4 25-71m49-24 35 73q8 14 22 5l25-18-43-79" fill="url(#body)" stroke="#7993ad" strokeWidth="4" />
-        <path d="M148 207q0-30 30-30h85q30 0 30 30v104q0 23-25 23h-95q-25 0-25-23z" fill="url(#body)" stroke="#7993ad" strokeWidth="4" />
-        <path d="M164 222q0-15 17-15h78q16 0 16 15v43q0 16-17 16h-77q-17 0-17-16z" fill="#dce8f6" />
-        <circle className="robot-heart" cx="205" cy="242" r="13" fill="#56d9c1" filter="url(#glow)" /><circle className="robot-heart robot-heart-right" cx="246" cy="242" r="13" fill="#56d9c1" filter="url(#glow)" />
-        <path d="M204 272q20 13 42 0" fill="none" stroke="#547c9c" strokeWidth="4" strokeLinecap="round" />
-        <g className="robot-arms"><path d="m147 224-47 20q-12 5-7 18l20 56q5 14 20 8l19-9m143-95 48 20q12 5 7 18l-21 56q-5 14-20 8l-18-9" fill="url(#body)" stroke="#7993ad" strokeWidth="4" /></g>
-        <rect x="177" y="115" width="78" height="83" rx="27" fill="url(#body)" stroke="#7993ad" strokeWidth="4" /><rect x="169" y="127" width="95" height="61" rx="23" fill="url(#face)" />
-        <circle className="robot-eye" cx="196" cy="156" r="7" fill="#ffae35" filter="url(#glow)" /><circle className="robot-eye robot-eye-right" cx="237" cy="156" r="7" fill="#ffae35" filter="url(#glow)" />
-        <path d="M215 115V94m-12 0h24" stroke="#7993ad" strokeWidth="5" strokeLinecap="round" /><circle className="robot-antenna" cx="215" cy="87" r="7" fill="#f39200" filter="url(#glow)" />
-        <rect x="193" y="331" width="46" height="11" rx="5" fill="#6f89a1" />
-        <path d="m168 366-15 26q-5 10 8 13h54q14-3 8-15l-9-24m32 0 20 25q8 11 19 3l34-25q8-10-1-18l-15-13" fill="url(#body)" stroke="#7993ad" strokeWidth="4" />
-        </g>
-      </svg>
-      <div className="art-chip chip-left"><span className="chip-icon">⌁</span><span>SMART<br />SYSTEM</span></div>
-      <div className="art-chip chip-right"><span className="chip-icon">✳</span><span>IDEA →<br />IMPACT</span></div>
+    <div className="hero-art">
+      <img
+        className="hero-poster"
+        src="/lontara-welcoming-poster.png"
+        alt="Poster Selamat Datang Para Habibie Muda di Lontara IoT & Robotics Bootcamp"
+      />
     </div>
   );
 }
@@ -144,8 +117,17 @@ export default function HomePage({ news, newsError }) {
             <p className="hero-description">Ruang belajar teknologi yang berakar pada kearifan, bergerak dengan inovasi, dan tumbuh bersama generasi pencipta.</p>
             <div className="hero-actions"><a className="button button-dark" href="#program">Jelajahi program <ArrowIcon /></a><a className="button button-quiet" href="#tentang">Kenali Lontara <span>↓</span></a></div>
             <div className="hero-note"><span className="note-star">✳</span><span>Berakar pada kearifan,<br />bergerak dengan inovasi.</span></div>
+            <div className="hero-partners" aria-label="Mitra pendukung">
+              <span className="footer-label">DIDUKUNG OLEH</span>
+              <div className="hero-partner-logos">
+                <img src="/logo-danantara.webp" alt="Danantara Indonesia" />
+                <img src="/logo-sulawesi-selatan.png" alt="Sulawesi Selatan" />
+                <img src="/logo-bpsdm.png" alt="BPSDM Sulawesi Selatan" />
+                <img src="/logo-telkom-indonesia.png" alt="Telkom Indonesia" />
+              </div>
+            </div>
           </div>
-          <div data-reveal="scale"><RobotIllustration /></div>
+          <div data-reveal="scale"><HeroPoster /></div>
           <div className="hero-foot"><span>01 — BELAJAR DENGAN MEMBUAT</span><span>MAKASSAR, INDONESIA <span className="pulse-dot" /></span></div>
         </section>
 
