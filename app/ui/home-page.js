@@ -171,14 +171,20 @@ export default function HomePage({ news, newsError }) {
           <div className="manifesto-side">
             <p className="eyebrow"><span className="eyebrow-line" /> TENTANG LONTARA</p>
             <div className="manifesto-video">
-              <iframe
-                src="https://www.youtube-nocookie.com/embed/DgFmubs5kNo"
-                title="Video Lontara IoT & Robotics Bootcamp"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                loading="lazy"
-                allowFullScreen
-              />
+              <div className="manifesto-video-heading">
+                <span><span className="manifesto-video-dot" /> LONTARA / VIDEO STORY</span>
+                <a href="https://youtu.be/DgFmubs5kNo" target="_blank" rel="noreferrer">Tonton di YouTube <ArrowIcon /></a>
+              </div>
+              <div className="manifesto-video-frame">
+                <iframe
+                  src="https://www.youtube-nocookie.com/embed/DgFmubs5kNo"
+                  title="Video Lontara IoT & Robotics Bootcamp"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  loading="lazy"
+                  allowFullScreen
+                />
+              </div>
             </div>
           </div>
           <div className="manifesto-copy" data-reveal="right"><h2>LONTARA IoT &<br />Robotics <span>Bootcamp 2026.</span></h2><p>merupakan program pengembangan talenta teknologi muda Sulawesi Selatan yang dirancang untuk membekali siswa SMK dengan pengetahuan, keterampilan, kreativitas, dan pengalaman nyata dalam bidang  <strong>Internet of Things (IoT) dan Robotika.</strong></p><a className="text-link" href="#program">Temukan cara kami belajar <ArrowIcon /></a></div>
