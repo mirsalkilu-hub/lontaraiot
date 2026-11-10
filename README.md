@@ -6,9 +6,8 @@ Website Lontara IoT & Robotic Bootcamps menggunakan Supabase untuk data berita, 
 
 1. Buat proyek Supabase.
 2. Jalankan `supabase/schema.sql` melalui SQL Editor untuk membuat tabel, indeks, bucket gambar publik, dan kebijakan Row Level Security. Skrip aman dijalankan ulang dan menambahkan kolom `published_at`, `author_id`, serta `created_at` jika tabel `posts` lama belum memilikinya. Berita lama tetap dipertahankan; berita yang diterbitkan melalui admin akan mencatat akun penulisnya.
-3. Buat akun admin melalui **Authentication → Users**. Matikan pendaftaran publik di pengaturan **Authentication → Sign In / Providers**.
-4. Di pengaturan pengguna tersebut, tetapkan **App Metadata** menjadi `{"role":"admin"}`. Jangan gunakan User Metadata untuk peran admin.
-5. Salin `.env.example` menjadi `.env.local`, lalu isi URL proyek dan publishable/anon key dari **Project Settings → API Keys**. Service role key hanya diperlukan untuk migrasi berita lama.
+3. Buat akun pengguna melalui **Authentication → Users**. Matikan pendaftaran publik di pengaturan **Authentication → Sign In / Providers**.
+4. Salin `.env.example` menjadi `.env.local`, lalu isi URL proyek dan publishable/anon key dari **Project Settings → API Keys**. Untuk memberikan peran admin, ikuti bagian [Menambahkan admin](#menambahkan-admin).
 
 ### Menjalankan lokal
 
@@ -17,12 +16,19 @@ Website Lontara IoT & Robotic Bootcamps menggunakan Supabase untuk data berita, 
 3. Buka `http://localhost:3000/admin`, lalu masuk menggunakan email dan kata sandi akun admin Supabase.
 4. Tulis judul, ringkasan, isi berita, kategori, tanggal, dan gambar opsional (JPEG/PNG/WebP hingga 5 MB). Artikel yang diterbitkan akan muncul di halaman utama dan memiliki halaman detail sendiri.
 
+### Menambahkan admin
+
+1. Buat akun pengguna melalui **Authentication → Users**.
+2. Pastikan `SUPABASE_SERVICE_ROLE_KEY` sudah diatur di `.env.local`. Gunakan key baru jika key sebelumnya pernah dibagikan. Key ini hanya boleh digunakan secara lokal/server dan jangan dibagikan atau dimasukkan ke browser.
+3. Jalankan `npm run admin:promote -- email-admin@example.com`, ganti dengan email akun yang dibuat.
+4. Logout lalu login kembali di `/admin` agar sesi memuat peran yang baru.
+
 ### Memindahkan berita lama
 
 `data/news.json` dan `data/uploads` hanya dipakai sebagai sumber migrasi. Setelah menjalankan skema SQL dan membuat admin:
 
-1. Tambahkan `SUPABASE_SERVICE_ROLE_KEY` ke `.env.local` untuk sementara. Kunci ini hanya untuk skrip migrasi dan jangan pernah diawali `NEXT_PUBLIC_` atau dibagikan ke browser.
+1. Pastikan `SUPABASE_SERVICE_ROLE_KEY` ada di `.env.local`. Kunci ini hanya untuk skrip server lokal dan jangan pernah diawali `NEXT_PUBLIC_` atau dibagikan ke browser.
 2. Jalankan `npm run migrate:news`. Skrip mengimpor berita serta gambar lokal ke tabel `posts` dan bucket `news-images`.
-3. Hapus `SUPABASE_SERVICE_ROLE_KEY` dari `.env.local` setelah migrasi. Berita dan gambar selanjutnya langsung disimpan di Supabase.
+3. Hapus `SUPABASE_SERVICE_ROLE_KEY` dari `.env.local` jika tidak lagi diperlukan untuk migrasi atau menambahkan admin. Berita dan gambar selanjutnya langsung disimpan di Supabase.
 
 Pastikan setiap admin ditetapkan dengan App Metadata `role: admin`. API dan kebijakan database/storage memeriksa peran tersebut; akses tulis tidak diberikan hanya karena pengguna berhasil login.#
