@@ -119,6 +119,10 @@ html.motion-ready [data-reveal].is-visible { opacity: 1; translate: 0 0; scale: 
 
 .news-section { background: var(--paper); }
 .news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+.news-search { display: flex; flex-direction: column; gap: 7px; width: min(100%, 360px); margin: -20px 0 24px auto; }
+.news-search label { color: #536984; font-size: 11px; font-weight: 600; }
+.news-search input { width: 100%; min-height: 42px; padding: 10px 13px; border: 1px solid #dce4f0; border-radius: 4px; color: var(--ink); background: #fbfcff; outline: none; font: inherit; font-size: 12px; transition: border-color .2s, box-shadow .2s; }
+.news-search input:focus { border-color: #6e92c2; box-shadow: 0 0 0 3px rgba(83,126,185,.13); }
 .news-card { min-width: 0; background: #fbfcff; border: 1px solid #e0e7f1; }
 .news-card-link { display: block; height: 100%; }
 .news-card-link:hover .news-art-shape { transform: scale(1.12) rotate(-5deg); }

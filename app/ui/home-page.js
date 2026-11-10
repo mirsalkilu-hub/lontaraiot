@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import SiteFooter from "./site-footer";
 import SiteHeader from "./site-header";
 
@@ -51,14 +51,34 @@ function PartnerLogos() {
 }
 
 function NewsSection({ news, error }) {
+  const [search, setSearch] = useState("");
+  const latestNews = news.slice(0, 6);
+  const normalizedSearch = search.trim().toLocaleLowerCase("id-ID");
+  const filteredNews = latestNews.filter((item) =>
+    [item.title, item.category, item.excerpt, item.date]
+      .some((value) => value?.toLocaleLowerCase("id-ID").includes(normalizedSearch)),
+  );
+
   return (
     <section className="section news-section" id="berita">
       <div className="section-top" data-reveal="up">
         <div><p className="eyebrow"><span className="eyebrow-line" /> CERITA TERBARU</p><h2>Kabar dari<br />ruang <span>kreasi.</span></h2></div>
         <p className="section-intro">Ikuti cerita, kegiatan, dan ide baru dari perjalanan belajar teknologi bersama LontaraIoT.</p>
       </div>
-      {error ? <p className="empty-news" role="status">{error}</p> : news.length ? <div className="news-grid">
-        {news.slice(0, 3).map((item, index) => (
+      {!error && latestNews.length > 0 && (
+        <div className="news-search">
+          <label htmlFor="news-search">Cari berita</label>
+          <input
+            id="news-search"
+            type="search"
+            placeholder="Judul, kategori, ringkasan, atau tanggal"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </div>
+      )}
+      {error ? <p className="empty-news" role="status">{error}</p> : latestNews.length ? filteredNews.length ? <div className="news-grid">
+        {filteredNews.map((item, index) => (
           <article className={`news-card news-card-${index + 1}`} key={item.id} data-reveal="up" style={{ "--reveal-delay": `${index * 110}ms` }}>
             <a className="news-card-link" href={`/berita/${encodeURIComponent(item.slug)}`} aria-label={`Baca berita: ${item.title}`}>
               <div className={item.imageUrl ? "news-art news-art-with-photo" : "news-art"}>{item.imageUrl ? <img className="news-photo" src={item.imageUrl} alt="" /> : <span className="news-art-shape">{index === 0 ? "⌘" : index === 1 ? "◈" : "✳"}</span>}<span className="news-art-index">0{index + 1}</span><span className="news-art-caption">LONTARA / JOURNAL</span></div>
@@ -66,7 +86,7 @@ function NewsSection({ news, error }) {
             </a>
           </article>
         ))}
-      </div> : <p className="empty-news">Berita baru sedang disiapkan. Kunjungi lagi segera!</p>}
+      </div> : <p className="empty-news" role="status">Tidak ada berita yang cocok dengan pencarian.</p> : <p className="empty-news">Berita baru sedang disiapkan. Kunjungi lagi segera!</p>}
       <a className="text-link" href="/admin">Kelola berita <ArrowIcon /></a>
     </section>
   );
