@@ -148,17 +148,7 @@ export default function HomePage({ news, newsError }) {
           <div className="hero-content" data-reveal="up">
             <p className="eyebrow"><span className="eyebrow-line" /> LONTARA IoT & ROBOTIC BOOTCAMPS</p>
             <h1>LONTARA IoT & <br />ROBOTICS <span>BOOTCAMP 2026.</span></h1>
-            <p className="hero-description">
-              <span className="hero-description-lead">Think. Build. Innovate. Shape the Future</span>
-              <br />
-              Bukan sekadar belajar teknologi. Saatnya menjadi pencipta inovasi!
-              <br />
-              Bergabunglah dalam pengalaman belajar intensif Internet of Things (IoT) dan Robotika. Eksplorasi teknologi, rakit perangkat, tulis kode, bangun prototipe, dan buktikan kreativitasmu melalui kompetisi inovasi teknologi.
-              <br />
-              19 dan 23–25 November 2026
-              <br />
-              Kota Parepare, Sulawesi Selatan.
-            </p>
+            <p className="hero-description">Think. Build. Innovate. Shape the Future. Bukan sekadar belajar teknologi. Saatnya menjadi pencipta inovasi! Bergabunglah dalam pengalaman belajar intensif Internet of Things (IoT) dan Robotika. Eksplorasi teknologi, rakit perangkat, tulis kode, bangun prototipe, dan buktikan kreativitasmu melalui kompetisi inovasi teknologi. 19 dan 23–25 November 2026 Kota Parepare, Sulawesi Selatan.</p>
             <div className="hero-actions"><a className="button button-dark" href="#program">Jelajahi program <ArrowIcon /></a><a className="button button-quiet" href="#tentang">Kenali Lontara <span>↓</span></a></div>
             <div className="hero-note"><span className="note-star">✳</span><span>Berakar pada kearifan,<br />bergerak dengan inovasi.</span></div>
             <PartnerLogos />
