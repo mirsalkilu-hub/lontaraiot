@@ -47,19 +47,27 @@ export default async function NewsArticlePage({ params }) {
     <main className="article-page">
       <SiteHeader />
       <article className="article-content">
-        <Link className="article-back article-back-mobile" href="/#berita">← Semua berita</Link>
-        <div className="article-heading">
-          <div className="article-meta"><span>{article.category}</span><time dateTime={article.date}>{formattedDate}</time></div>
+        <header className="article-heading">
+          <Link className="article-back" href="/#berita"><span aria-hidden="true">←</span> Semua berita</Link>
+          <p className="article-kicker"><span className="eyebrow-line" /> LONTARA / JOURNAL</p>
+          <div className="article-meta"><span>{article.category}</span><span className="article-meta-dot" aria-hidden="true" /><time dateTime={article.date}>{formattedDate}</time></div>
           <h1>{article.title}</h1>
           <p className="article-excerpt">{article.excerpt}</p>
-        </div>
-        {article.imageUrl && <img className="article-image" src={article.imageUrl} alt={article.title} />}
+        </header>
+        {article.imageUrl && (
+          <figure className="article-image-wrap">
+            <img className="article-image" src={article.imageUrl} alt={article.title} />
+          </figure>
+        )}
         <div className="article-body">
           {article.content.split(/\n\s*\n/).map((paragraph, index) => (
             <p key={`${index}-${paragraph.slice(0, 20)}`}>{paragraph}</p>
           ))}
         </div>
-        <Link className="text-link article-return" href="/#berita">Kembali ke semua berita <span aria-hidden="true">↗</span></Link>
+        <footer className="article-end">
+          <span className="article-end-label"><span aria-hidden="true">✳</span> AKHIR CERITA</span>
+          <Link className="text-link article-return" href="/#berita">Jelajahi berita lainnya <span aria-hidden="true">↗</span></Link>
+        </footer>
       </article>
       <SiteFooter />
     </main>
