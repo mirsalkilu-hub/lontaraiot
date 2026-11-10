@@ -148,7 +148,19 @@ export default function HomePage({ news, newsError }) {
         </section>
 
         <section className="manifesto" id="tentang">
-          <div className="manifesto-side"><p className="eyebrow"><span className="eyebrow-line" /> TENTANG LONTARA</p><span className="manifesto-symbol">L<span>✳</span></span></div>
+          <div className="manifesto-side">
+            <p className="eyebrow"><span className="eyebrow-line" /> TENTANG LONTARA</p>
+            <div className="manifesto-video">
+              <iframe
+                src="https://www.youtube-nocookie.com/embed/DgFmubs5kNo"
+                title="Video Lontara IoT & Robotics Bootcamp"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                loading="lazy"
+                allowFullScreen
+              />
+            </div>
+          </div>
           <div className="manifesto-copy" data-reveal="right"><h2>LONTARA IoT &<br />Robotics <span>Bootcamp 2026.</span></h2><p>merupakan program pengembangan talenta teknologi muda Sulawesi Selatan yang dirancang untuk membekali siswa SMK dengan pengetahuan, keterampilan, kreativitas, dan pengalaman nyata dalam bidang  <strong>Internet of Things (IoT) dan Robotika.</strong></p><a className="text-link" href="#program">Temukan cara kami belajar <ArrowIcon /></a></div>
         </section>
 
