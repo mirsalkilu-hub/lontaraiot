@@ -29,8 +29,8 @@ function HeroPoster() {
     <div className="hero-art">
       <img
         className="hero-poster"
-        src="/lontara-welcoming-poster.png"
-        alt="Poster Selamat Datang Para Habibie Muda di Lontara IoT & Robotics Bootcamp"
+        src="/lontara-welcoming-poster.jpg"
+        alt="Poster Selamat Datang Peserta Lontara IoT & Robotics Bootcamp"
       />
     </div>
   );
