@@ -38,12 +38,27 @@ export default function ActivityManagement({ accessToken }) {
   const [sessions, setSessions] = useState([]);
   const [attendance, setAttendance] = useState([]);
   const [sessionDates, setSessionDates] = useState({});
+  const [participantSearch, setParticipantSearch] = useState("");
+  const [participantActivityFilter, setParticipantActivityFilter] = useState("");
   const [form, setForm] = useState(emptyActivity);
   const [editingId, setEditingId] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const headers = { Authorization: `Bearer ${accessToken}` };
+  const normalizedParticipantSearch = participantSearch.trim().toLocaleLowerCase("id-ID");
+  const filteredRegistrations = registrations.filter((registration) => {
+    if (participantActivityFilter && registration.activity_id !== participantActivityFilter) return false;
+    const activityTitle = activities.find((activity) => activity.id === registration.activity_id)?.title || "";
+    return [
+      registration.full_name,
+      registration.gender,
+      registration.email,
+      registration.phone,
+      registration.organization,
+      activityTitle,
+    ].some((value) => value?.toLocaleLowerCase("id-ID").includes(normalizedParticipantSearch));
+  });
 
   async function loadData() {
     const [activityData, registrationData, sessionData, attendanceData] = await Promise.all([
@@ -414,6 +429,67 @@ export default function ActivityManagement({ accessToken }) {
       </form>
 
       {message && <p className="activity-admin-message" role="status">{message}</p>}
+
+      <section className="admin-registration-list" aria-labelledby="admin-registration-heading">
+        <div className="admin-news-list-head">
+          <div>
+            <span className="admin-panel-kicker">REGISTERED PARTICIPANTS</span>
+            <h3 id="admin-registration-heading">Peserta terdaftar <span>{filteredRegistrations.length} / {registrations.length}</span></h3>
+          </div>
+        </div>
+        <div className="admin-registration-filters">
+          <label htmlFor="participant-search">Cari peserta
+            <input
+              id="participant-search"
+              type="search"
+              value={participantSearch}
+              onChange={(event) => setParticipantSearch(event.target.value)}
+              placeholder="Nama, email, telepon, sekolah..."
+            />
+          </label>
+          <label htmlFor="participant-activity-filter">Filter kegiatan
+            <select
+              id="participant-activity-filter"
+              value={participantActivityFilter}
+              onChange={(event) => setParticipantActivityFilter(event.target.value)}
+            >
+              <option value="">Semua kegiatan</option>
+              {activities.map((activity) => <option key={activity.id} value={activity.id}>{activity.title}</option>)}
+            </select>
+          </label>
+        </div>
+        {loading ? <p className="admin-status">Memuat daftar peserta...</p> : filteredRegistrations.length ? (
+          <div className="admin-registration-table-wrap">
+            <table className="admin-registration-table">
+              <thead>
+                <tr>
+                  <th>Peserta</th>
+                  <th>Kegiatan</th>
+                  <th>Kontak</th>
+                  <th>Sekolah / instansi</th>
+                  <th>Waktu daftar</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredRegistrations.map((registration) => {
+                  const activity = activities.find((item) => item.id === registration.activity_id);
+                  return (
+                    <tr key={registration.id}>
+                      <td><strong>{registration.full_name}</strong><span>{registration.gender || "Belum diisi"}</span></td>
+                      <td>{activity?.title || registration.activities?.title || "Kegiatan dihapus"}</td>
+                      <td><span>{registration.email}</span><span>{registration.phone}</span></td>
+                      <td>{registration.organization}</td>
+                      <td>{registration.created_at ? new Date(registration.created_at).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" }) : "—"}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        ) : <p className="admin-registration-empty" role="status">
+          {registrations.length ? "Tidak ada peserta yang cocok dengan pencarian atau filter." : "Belum ada peserta yang mendaftar."}
+        </p>}
+      </section>
 
       <div className="activity-admin-list">
         {loading ? <p className="admin-status">Memuat kegiatan dan peserta...</p> : activities.length === 0 ? (
