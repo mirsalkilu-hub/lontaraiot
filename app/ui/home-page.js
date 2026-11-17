@@ -192,7 +192,7 @@ export default function HomePage({ news, newsError }) {
 
         <NewsSection news={news} error={newsError} />
 
-        <section className="contact-banner" id="kontak" data-reveal="up"><div className="contact-star">✳</div><div><p className="eyebrow"><span className="eyebrow-line" /> MASA DEPAN DIMULAI DARI SINI</p><h2>Punya ide? Ayo<br /><span>wujudkan bersama.</span></h2></div><a className="button button-light" href="mailto:hello@lontaraiot.id">Hubungi kami <ArrowIcon /></a><div className="contact-orbit" /></section>
+        <section className="contact-banner" id="kontak" data-reveal="up"><div className="contact-star">✳</div><div><p className="eyebrow"><span className="eyebrow-line" /> MASA DEPAN DIMULAI DARI SINI</p><h2>Punya ide? Ayo<br /><span>wujudkan bersama.</span></h2></div><div className="contact-banner-actions"><a className="button button-light" href="mailto:hello@lontaraiot.id">Hubungi kami <ArrowIcon /></a><a className="button button-banner-outline" href="/kegiatan">Daftar kegiatan <ArrowIcon /></a></div><div className="contact-orbit" /></section>
       </main>
 
       <div className="mobile-partners">

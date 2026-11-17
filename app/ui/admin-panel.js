@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 import { isSupabaseConfigured } from "../../lib/supabase/config";
+import ActivityManagement from "./activity-management";
 
 const blankNews = {
   title: "",
@@ -406,6 +407,7 @@ export default function AdminPanel() {
                 </div>
               )}
             </section>
+            <ActivityManagement accessToken={accessToken} />
           </div>
         )}
       </section>

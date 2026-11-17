@@ -19,7 +19,8 @@ export default function SiteHeader({ home = false }) {
         <a href={sectionHref("tentang")} onClick={closeMenu}>Tentang</a>
         <a href={sectionHref("program")} onClick={closeMenu}>Program</a>
         <a href={sectionHref("berita")} onClick={closeMenu}>Berita</a>
-        <a className="nav-cta" href={sectionHref("kontak")} onClick={closeMenu}>Mulai jelajah <span aria-hidden="true">↗</span></a>
+        <a href="/kegiatan" onClick={closeMenu}>Kegiatan</a>
+        <a className="nav-cta" href="/kegiatan" onClick={closeMenu}>Daftar kegiatan <span aria-hidden="true">↗</span></a>
       </nav>
     </header>
   );
