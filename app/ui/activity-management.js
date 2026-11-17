@@ -32,6 +32,12 @@ function safeFilename(value) {
     .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "kegiatan";
 }
 
+function compareParticipantOrder(first, second) {
+  return Number(first.sort_order ?? 0) - Number(second.sort_order ?? 0) ||
+    String(first.created_at || "").localeCompare(String(second.created_at || "")) ||
+    first.id.localeCompare(second.id);
+}
+
 export default function ActivityManagement({ accessToken }) {
   const [activities, setActivities] = useState([]);
   const [registrations, setRegistrations] = useState([]);
@@ -40,6 +46,10 @@ export default function ActivityManagement({ accessToken }) {
   const [sessionDates, setSessionDates] = useState({});
   const [participantSearch, setParticipantSearch] = useState("");
   const [participantActivityFilter, setParticipantActivityFilter] = useState("");
+  const [editingParticipant, setEditingParticipant] = useState(null);
+  const [participantForm, setParticipantForm] = useState(null);
+  const [savingParticipant, setSavingParticipant] = useState(false);
+  const [movingParticipantId, setMovingParticipantId] = useState("");
   const [form, setForm] = useState(emptyActivity);
   const [editingId, setEditingId] = useState("");
   const [loading, setLoading] = useState(true);
@@ -47,7 +57,24 @@ export default function ActivityManagement({ accessToken }) {
   const [message, setMessage] = useState("");
   const headers = { Authorization: `Bearer ${accessToken}` };
   const normalizedParticipantSearch = participantSearch.trim().toLocaleLowerCase("id-ID");
-  const filteredRegistrations = registrations.filter((registration) => {
+  const registrationsByActivity = new Map();
+  registrations.forEach((registration) => {
+    const activityRegistrations = registrationsByActivity.get(registration.activity_id) || [];
+    activityRegistrations.push(registration);
+    registrationsByActivity.set(registration.activity_id, activityRegistrations);
+  });
+  const participantPositions = new Map();
+  registrationsByActivity.forEach((activityRegistrations) => {
+    activityRegistrations.sort(compareParticipantOrder).forEach((registration, index) => {
+      participantPositions.set(registration.id, { index, total: activityRegistrations.length });
+    });
+  });
+  const orderedRegistrations = [...registrations].sort((first, second) => {
+    const firstActivity = activities.find((activity) => activity.id === first.activity_id)?.title || "";
+    const secondActivity = activities.find((activity) => activity.id === second.activity_id)?.title || "";
+    return firstActivity.localeCompare(secondActivity, "id-ID") || compareParticipantOrder(first, second);
+  });
+  const filteredRegistrations = orderedRegistrations.filter((registration) => {
     if (participantActivityFilter && registration.activity_id !== participantActivityFilter) return false;
     const activityTitle = activities.find((activity) => activity.id === registration.activity_id)?.title || "";
     return [
@@ -134,6 +161,79 @@ export default function ActivityManagement({ accessToken }) {
       setMessage("Kegiatan dan data pendaftarannya berhasil dihapus.");
     } catch (error) {
       setMessage(error.message);
+    }
+  }
+
+  function startEditingParticipant(participant) {
+    setEditingParticipant(participant);
+    setParticipantForm({
+      full_name: participant.full_name,
+      gender: participant.gender || "Belum diisi",
+      email: participant.email,
+      phone: participant.phone,
+      organization: participant.organization,
+    });
+    setMessage("");
+  }
+
+  function cancelEditingParticipant() {
+    setEditingParticipant(null);
+    setParticipantForm(null);
+  }
+
+  async function saveParticipant(event) {
+    event.preventDefault();
+    setSavingParticipant(true);
+    setMessage("");
+    try {
+      const updated = await requestJson("/api/registrations", {
+        method: "PUT",
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify({ ...participantForm, id: editingParticipant.id }),
+      });
+      setRegistrations((items) => items.map((item) => item.id === updated.id ? { ...item, ...updated } : item));
+      cancelEditingParticipant();
+      setMessage("Data peserta berhasil diperbarui.");
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setSavingParticipant(false);
+    }
+  }
+
+  async function deleteParticipant(participant) {
+    const activityTitle = activities.find((activity) => activity.id === participant.activity_id)?.title || "kegiatan ini";
+    if (!window.confirm(`Hapus pendaftaran ${participant.full_name} dari "${activityTitle}"? Riwayat absensinya juga akan dihapus.`)) return;
+    setMessage("");
+    try {
+      await requestJson(`/api/registrations?id=${encodeURIComponent(participant.id)}`, { method: "DELETE", headers });
+      setRegistrations((items) => items.filter((item) => item.id !== participant.id));
+      setAttendance((items) => items.filter((item) => item.registration_id !== participant.id));
+      if (editingParticipant?.id === participant.id) cancelEditingParticipant();
+      setMessage("Pendaftaran peserta dan riwayat absensinya berhasil dihapus.");
+    } catch (error) {
+      setMessage(error.message);
+    }
+  }
+
+  async function moveParticipant(participant, direction) {
+    setMovingParticipantId(participant.id);
+    setMessage("");
+    try {
+      const updatedOrder = await requestJson("/api/registrations", {
+        method: "PATCH",
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify({ id: participant.id, direction }),
+      });
+      const orderById = new Map(updatedOrder.map((item) => [item.id, item.sort_order]));
+      setRegistrations((items) => items.map((item) => orderById.has(item.id)
+        ? { ...item, sort_order: orderById.get(item.id) }
+        : item));
+      setMessage("Urutan peserta berhasil diperbarui.");
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setMovingParticipantId("");
     }
   }
 
@@ -435,6 +535,7 @@ export default function ActivityManagement({ accessToken }) {
           <div>
             <span className="admin-panel-kicker">REGISTERED PARTICIPANTS</span>
             <h3 id="admin-registration-heading">Peserta terdaftar <span>{filteredRegistrations.length} / {registrations.length}</span></h3>
+            <p className="admin-registration-help">Gunakan tombol panah untuk mengubah urutan peserta dalam kegiatannya.</p>
           </div>
         </div>
         <div className="admin-registration-filters">
@@ -458,6 +559,44 @@ export default function ActivityManagement({ accessToken }) {
             </select>
           </label>
         </div>
+        {editingParticipant && participantForm && (
+          <form className="admin-registration-edit-form" onSubmit={saveParticipant}>
+            <div className="admin-registration-edit-head">
+              <div>
+                <span className="admin-panel-kicker">EDIT PARTICIPANT</span>
+                <h4>Edit data peserta</h4>
+                <p>Kegiatan peserta tidak berubah agar riwayat absensinya tetap terhubung.</p>
+              </div>
+              <button className="admin-text-button" type="button" onClick={cancelEditingParticipant}>Batal</button>
+            </div>
+            <div className="admin-registration-edit-fields">
+              <label>Nama lengkap
+                <input required maxLength={120} value={participantForm.full_name} onChange={(event) => setParticipantForm({ ...participantForm, full_name: event.target.value })} />
+              </label>
+              <label>Jenis kelamin
+                <select required value={participantForm.gender} onChange={(event) => setParticipantForm({ ...participantForm, gender: event.target.value })}>
+                  <option value="Laki-laki">Laki-laki</option>
+                  <option value="Perempuan">Perempuan</option>
+                  <option value="Memilih tidak menjawab">Memilih tidak menjawab</option>
+                  {participantForm.gender === "Belum diisi" && <option value="Belum diisi">Belum diisi</option>}
+                </select>
+              </label>
+              <label>Email
+                <input required type="email" maxLength={254} value={participantForm.email} onChange={(event) => setParticipantForm({ ...participantForm, email: event.target.value })} />
+              </label>
+              <label>Nomor telepon
+                <input required type="tel" maxLength={40} pattern=".*[0-9].*" value={participantForm.phone} onChange={(event) => setParticipantForm({ ...participantForm, phone: event.target.value })} />
+              </label>
+              <label>Sekolah / instansi
+                <input required maxLength={160} value={participantForm.organization} onChange={(event) => setParticipantForm({ ...participantForm, organization: event.target.value })} />
+              </label>
+            </div>
+            <div className="admin-form-actions">
+              <button className="button button-dark" type="submit" disabled={savingParticipant}>{savingParticipant ? "Menyimpan..." : "Simpan data"} <span>↗</span></button>
+              <button className="admin-secondary-button" type="button" onClick={cancelEditingParticipant} disabled={savingParticipant}>Batal</button>
+            </div>
+          </form>
+        )}
         {loading ? <p className="admin-status">Memuat daftar peserta...</p> : filteredRegistrations.length ? (
           <div className="admin-registration-table-wrap">
             <table className="admin-registration-table">
@@ -468,11 +607,13 @@ export default function ActivityManagement({ accessToken }) {
                   <th>Kontak</th>
                   <th>Sekolah / instansi</th>
                   <th>Waktu daftar</th>
+                  <th>Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredRegistrations.map((registration) => {
                   const activity = activities.find((item) => item.id === registration.activity_id);
+                  const position = participantPositions.get(registration.id);
                   return (
                     <tr key={registration.id}>
                       <td><strong>{registration.full_name}</strong><span>{registration.gender || "Belum diisi"}</span></td>
@@ -480,6 +621,14 @@ export default function ActivityManagement({ accessToken }) {
                       <td><span>{registration.email}</span><span>{registration.phone}</span></td>
                       <td>{registration.organization}</td>
                       <td>{registration.created_at ? new Date(registration.created_at).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" }) : "—"}</td>
+                      <td>
+                        <div className="admin-participant-actions">
+                          <button className="admin-secondary-button" type="button" aria-label={`Naikkan urutan ${registration.full_name}`} title="Naikkan urutan" disabled={!position || position.index === 0 || movingParticipantId !== ""} onClick={() => moveParticipant(registration, "up")}>↑</button>
+                          <button className="admin-secondary-button" type="button" aria-label={`Turunkan urutan ${registration.full_name}`} title="Turunkan urutan" disabled={!position || position.index === position.total - 1 || movingParticipantId !== ""} onClick={() => moveParticipant(registration, "down")}>↓</button>
+                          <button className="admin-secondary-button" type="button" onClick={() => startEditingParticipant(registration)}>Edit</button>
+                          <button className="admin-secondary-button admin-delete-button" type="button" onClick={() => deleteParticipant(registration)}>Hapus</button>
+                        </div>
+                      </td>
                     </tr>
                   );
                 })}

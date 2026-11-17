@@ -5,7 +5,7 @@ Website Lontara IoT & Robotic Bootcamps menggunakan Supabase untuk data berita, 
 ### Persiapan Supabase
 
 1. Buat proyek Supabase.
-2. Jalankan `supabase/schema.sql` melalui SQL Editor untuk membuat tabel, indeks, bucket gambar publik, dan kebijakan Row Level Security. Skrip aman dijalankan ulang dan menambahkan kolom `published_at`, `author_id`, serta `created_at` jika tabel `posts` lama belum memilikinya. Berita lama tetap dipertahankan; berita yang diterbitkan melalui admin akan mencatat akun penulisnya. Tabel `activities` dan `registrations` menyimpan kegiatan serta satu kali pendaftaran peserta; `activity_sessions` dan `attendance_records` menyimpan tanggal dan status absensi per sesi. Status absensi lama akan dipindahkan ke tanggal kegiatan utama saat skema ini dijalankan.
+2. Jalankan `supabase/schema.sql` melalui SQL Editor untuk membuat tabel, indeks, bucket gambar publik, dan kebijakan Row Level Security. Skrip aman dijalankan ulang dan menambahkan kolom yang diperlukan jika tabel lama belum memilikinya. Berita lama tetap dipertahankan; pendaftaran peserta tetap satu kali per kegiatan, sementara `activity_sessions` dan `attendance_records` menyimpan tanggal serta status absensi per sesi. Status absensi lama dipindahkan ke tanggal kegiatan utama dan urutan awal peserta disusun berdasarkan waktu pendaftaran.
 3. Buat akun pengguna melalui **Authentication → Users**. Matikan pendaftaran publik di pengaturan **Authentication → Sign In / Providers**.
 4. Salin `.env.example` menjadi `.env.local`, lalu isi URL proyek dan publishable/anon key dari **Project Settings → API Keys**. Untuk memberikan peran admin, ikuti bagian [Menambahkan admin](#menambahkan-admin).
 
@@ -13,7 +13,7 @@ Website Lontara IoT & Robotic Bootcamps menggunakan Supabase untuk data berita, 
 
 1. Pasang dependensi dengan `npm install`.
 2. Jalankan `npm run dev`, lalu buka `http://localhost:3000`.
-3. Buka `http://localhost:3000/admin`, lalu masuk menggunakan email dan kata sandi akun admin Supabase. Admin dapat membuat kegiatan, melihat daftar peserta dengan pencarian dan filter kegiatan, mengatur pendaftaran, menambahkan beberapa tanggal absensi, menyalin link check-in per tanggal untuk dibagikan, menutup atau membuka link, dan mengunduh PDF/CSV rekap kehadiran.
+3. Buka `http://localhost:3000/admin`, lalu masuk menggunakan email dan kata sandi akun admin Supabase. Admin dapat membuat kegiatan, melihat, mengedit, menghapus, mencari, memfilter, dan mengubah urutan peserta per kegiatan; mengatur pendaftaran; menambahkan beberapa tanggal absensi; membagikan link check-in per tanggal; serta mengunduh rekap kehadiran PDF/CSV.
 4. Tulis judul, ringkasan, isi berita, kategori, tanggal, dan gambar opsional (JPEG/PNG/WebP hingga 5 MB). Artikel yang diterbitkan akan muncul di halaman utama dan memiliki halaman detail sendiri.
 5. Peserta dapat membuka `http://localhost:3000/kegiatan` untuk memilih kegiatan yang pendaftarannya masih dibuka dan mendaftar satu kali, termasuk memilih jenis kelamin. Untuk check-in pada tanggal tertentu, peserta membuka link absensi yang dibagikan admin dan mengisi email serta nomor telepon yang digunakan saat mendaftar.
 

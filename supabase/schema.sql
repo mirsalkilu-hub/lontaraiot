@@ -112,6 +112,7 @@ create table if not exists public.registrations (
   email text not null check (char_length(email) between 3 and 254),
   phone text not null check (char_length(phone) between 1 and 40),
   organization text not null check (char_length(organization) between 1 and 160),
+  sort_order integer,
   attended boolean not null default false,
   created_at timestamptz not null default now(),
   unique (activity_id, email),
@@ -121,6 +122,9 @@ create table if not exists public.registrations (
 
 alter table public.registrations
   add column if not exists gender text not null default 'Belum diisi';
+
+alter table public.registrations
+  add column if not exists sort_order integer;
 
 do $$
 begin
@@ -136,6 +140,23 @@ begin
   end if;
 end;
 $$;
+
+with ranked_registrations as (
+  select id, row_number() over (
+    partition by activity_id
+    order by created_at, id
+  ) - 1 as position
+  from public.registrations
+  where sort_order is null
+)
+update public.registrations
+set sort_order = ranked_registrations.position
+from ranked_registrations
+where registrations.id = ranked_registrations.id;
+
+alter table public.registrations
+  alter column sort_order set default 0,
+  alter column sort_order set not null;
 
 create index if not exists registrations_activity_idx
   on public.registrations (activity_id, created_at desc);
@@ -173,8 +194,99 @@ create policy "Admins can update registrations"
   using ((select auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
   with check ((select auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
+drop policy if exists "Admins can delete registrations" on public.registrations;
+create policy "Admins can delete registrations"
+  on public.registrations for delete
+  to authenticated
+  using ((select auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+
 grant insert on public.registrations to anon, authenticated;
-grant select, update on public.registrations to authenticated;
+grant select, update, delete on public.registrations to authenticated;
+
+create or replace function public.assign_registration_order()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+  perform id from public.activities where id = new.activity_id for update;
+  select coalesce(max(sort_order) + 1, 0)
+    into new.sort_order
+    from public.registrations
+    where activity_id = new.activity_id;
+  return new;
+end;
+$$;
+
+drop trigger if exists registrations_assign_order on public.registrations;
+create trigger registrations_assign_order
+  before insert on public.registrations
+  for each row execute function public.assign_registration_order();
+
+create or replace function public.move_registration(
+  p_registration_id uuid,
+  p_direction text
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare
+  target_activity_id uuid;
+  target_position integer;
+  neighbor_id uuid;
+  neighbor_position integer;
+begin
+  if coalesce(auth.jwt() -> 'app_metadata' ->> 'role', '') <> 'admin' then
+    raise exception 'Admin access required';
+  end if;
+  if p_direction not in ('up', 'down') then
+    raise exception 'Invalid move direction';
+  end if;
+
+  select activity_id into target_activity_id
+  from public.registrations
+  where id = p_registration_id;
+  if not found then return false; end if;
+
+  perform id from public.activities where id = target_activity_id for update;
+
+  with ranked_registrations as (
+    select id, row_number() over (
+      order by sort_order, created_at, id
+    ) - 1 as position
+    from public.registrations
+    where activity_id = target_activity_id
+  )
+  update public.registrations
+  set sort_order = ranked_registrations.position
+  from ranked_registrations
+  where registrations.id = ranked_registrations.id;
+
+  select sort_order into target_position
+  from public.registrations
+  where id = p_registration_id;
+
+  select id, sort_order into neighbor_id, neighbor_position
+  from public.registrations
+  where activity_id = target_activity_id
+    and sort_order = target_position + case when p_direction = 'up' then -1 else 1 end;
+  if not found then return false; end if;
+
+  update public.registrations
+  set sort_order = case
+    when id = p_registration_id then neighbor_position
+    else target_position
+  end
+  where id in (p_registration_id, neighbor_id);
+  return true;
+end;
+$$;
+
+revoke all on function public.move_registration(uuid, text) from public;
+grant execute on function public.move_registration(uuid, text) to authenticated;
 
 create table if not exists public.activity_sessions (
   id uuid primary key default gen_random_uuid(),
