@@ -46,6 +46,8 @@ export default function ActivityManagement({ accessToken }) {
   const [sessionDates, setSessionDates] = useState({});
   const [participantSearch, setParticipantSearch] = useState("");
   const [participantActivityFilter, setParticipantActivityFilter] = useState("");
+  const [participantSort, setParticipantSort] = useState("default");
+  const [participantPage, setParticipantPage] = useState(0);
   const [editingParticipant, setEditingParticipant] = useState(null);
   const [participantForm, setParticipantForm] = useState(null);
   const [savingParticipant, setSavingParticipant] = useState(false);
@@ -87,6 +89,20 @@ export default function ActivityManagement({ accessToken }) {
       activityTitle,
     ].some((value) => value?.toLocaleLowerCase("id-ID").includes(normalizedParticipantSearch));
   });
+  const sortedRegistrations = [...filteredRegistrations];
+  if (participantSort !== "default") {
+    const sortByOrganization = participantSort.startsWith("organization");
+    const descending = participantSort.endsWith("desc");
+    sortedRegistrations.sort((first, second) => {
+      const firstValue = sortByOrganization ? first.organization : first.full_name;
+      const secondValue = sortByOrganization ? second.organization : second.full_name;
+      const comparison = firstValue.localeCompare(secondValue, "id-ID", { sensitivity: "base" });
+      return (descending ? -comparison : comparison) || compareParticipantOrder(first, second);
+    });
+  }
+  const participantPageCount = Math.ceil(sortedRegistrations.length / 10);
+  const currentParticipantPage = Math.min(participantPage, Math.max(participantPageCount - 1, 0));
+  const visibleRegistrations = sortedRegistrations.slice(currentParticipantPage * 10, currentParticipantPage * 10 + 10);
 
   async function loadData() {
     const [activityData, registrationData, sessionData, attendanceData] = await Promise.all([
@@ -568,7 +584,10 @@ export default function ActivityManagement({ accessToken }) {
               id="participant-search"
               type="search"
               value={participantSearch}
-              onChange={(event) => setParticipantSearch(event.target.value)}
+              onChange={(event) => {
+                setParticipantSearch(event.target.value);
+                setParticipantPage(0);
+              }}
               placeholder="Nama, email, telepon, sekolah..."
             />
           </label>
@@ -576,10 +595,29 @@ export default function ActivityManagement({ accessToken }) {
             <select
               id="participant-activity-filter"
               value={participantActivityFilter}
-              onChange={(event) => setParticipantActivityFilter(event.target.value)}
+              onChange={(event) => {
+                setParticipantActivityFilter(event.target.value);
+                setParticipantPage(0);
+              }}
             >
               <option value="">Semua kegiatan</option>
               {activities.map((activity) => <option key={activity.id} value={activity.id}>{activity.title}</option>)}
+            </select>
+          </label>
+          <label htmlFor="participant-sort">Urutkan peserta
+            <select
+              id="participant-sort"
+              value={participantSort}
+              onChange={(event) => {
+                setParticipantSort(event.target.value);
+                setParticipantPage(0);
+              }}
+            >
+              <option value="default">Urutan awal</option>
+              <option value="name-asc">Nama peserta (A–Z)</option>
+              <option value="name-desc">Nama peserta (Z–A)</option>
+              <option value="organization-asc">Sekolah/instansi (A–Z)</option>
+              <option value="organization-desc">Sekolah/instansi (Z–A)</option>
             </select>
           </label>
         </div>
@@ -635,7 +673,7 @@ export default function ActivityManagement({ accessToken }) {
                 </tr>
               </thead>
               <tbody>
-                {filteredRegistrations.map((registration) => {
+                {visibleRegistrations.map((registration) => {
                   const activity = activities.find((item) => item.id === registration.activity_id);
                   const position = participantPositions.get(registration.id);
                   return (
@@ -662,6 +700,26 @@ export default function ActivityManagement({ accessToken }) {
         ) : <p className="admin-registration-empty" role="status">
           {registrations.length ? "Tidak ada peserta yang cocok dengan pencarian atau filter." : "Belum ada peserta yang mendaftar."}
         </p>}
+        {!loading && sortedRegistrations.length > 0 && (
+          <div className="admin-registration-pagination">
+            <span>Menampilkan {currentParticipantPage * 10 + 1}–{Math.min((currentParticipantPage + 1) * 10, sortedRegistrations.length)} dari {sortedRegistrations.length} peserta</span>
+            <div>
+              <button
+                className="admin-secondary-button"
+                type="button"
+                disabled={currentParticipantPage === 0}
+                onClick={() => setParticipantPage(currentParticipantPage - 1)}
+              >Sebelumnya</button>
+              <span>Halaman {currentParticipantPage + 1} dari {participantPageCount}</span>
+              <button
+                className="admin-secondary-button"
+                type="button"
+                disabled={currentParticipantPage >= participantPageCount - 1}
+                onClick={() => setParticipantPage(currentParticipantPage + 1)}
+              >Berikutnya</button>
+            </div>
+          </div>
+        )}
       </section>
 
       <div className="activity-admin-list">

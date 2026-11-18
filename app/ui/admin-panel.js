@@ -32,6 +32,7 @@ export default function AdminPanel() {
   const [loggingIn, setLoggingIn] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState("news");
   const notificationId = useRef(0);
 
   function notify(message, type = "success") {
@@ -260,8 +261,12 @@ export default function AdminPanel() {
       <section className="admin-content">
         <div className="admin-page-heading">
           <p className="eyebrow"><span className="eyebrow-line" /> RUANG PENGELOLA</p>
-          <h1>Dashboard <span>berita.</span></h1>
-          <p className="admin-lead">Kelola cerita dan kabar terbaru yang tampil di halaman utama LontaraIoT.</p>
+          <h1>Dashboard <span>{activeTab === "news" ? "berita." : "kegiatan."}</span></h1>
+          <p className="admin-lead">
+            {activeTab === "news"
+              ? "Kelola cerita dan kabar terbaru yang tampil di halaman utama LontaraIoT."
+              : "Kelola kegiatan, peserta, dan absensi LontaraIoT."}
+          </p>
         </div>
 
         {loading ? (
@@ -287,8 +292,10 @@ export default function AdminPanel() {
             <div className="admin-workspace-head">
               <div>
                 <span className="admin-panel-kicker">CONTENT MANAGEMENT</span>
-                <h2>{editingId ? "Perbarui berita" : "Tulis kabar baru"}</h2>
-                <p>{editingId ? "Perubahan akan langsung tampil di halaman berita." : "Bagikan perkembangan terbaru dari LontaraIoT."}</p>
+                <h2>{activeTab === "activities" ? "Kegiatan & absensi" : editingId ? "Perbarui berita" : "Tulis kabar baru"}</h2>
+                <p>{activeTab === "activities"
+                  ? "Atur kegiatan, pendaftaran, peserta, dan tanggal absensi."
+                  : editingId ? "Perubahan akan langsung tampil di halaman berita." : "Bagikan perkembangan terbaru dari LontaraIoT."}</p>
               </div>
               <div className="admin-dashboard-actions">
                 <span className="admin-session-badge"><span className="pulse-dot" /> Sesi aman</span>
@@ -298,6 +305,22 @@ export default function AdminPanel() {
               </div>
             </div>
 
+            <nav className="admin-section-tabs" aria-label="Pilih pengelolaan admin">
+              <button
+                className={activeTab === "news" ? "admin-section-tab is-active" : "admin-section-tab"}
+                type="button"
+                aria-pressed={activeTab === "news"}
+                onClick={() => setActiveTab("news")}
+              >Berita</button>
+              <button
+                className={activeTab === "activities" ? "admin-section-tab is-active" : "admin-section-tab"}
+                type="button"
+                aria-pressed={activeTab === "activities"}
+                onClick={() => setActiveTab("activities")}
+              >Kegiatan &amp; peserta</button>
+            </nav>
+
+            <section hidden={activeTab !== "news"} aria-label="Pengelolaan berita">
             <form className="admin-form" onSubmit={saveNews}>
               <label>Judul berita
                 <input required maxLength={120} value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} placeholder="Tulis judul yang jelas dan menarik" />
@@ -407,7 +430,10 @@ export default function AdminPanel() {
                 </div>
               )}
             </section>
-            <ActivityManagement accessToken={accessToken} />
+            </section>
+            <section hidden={activeTab !== "activities"} aria-label="Pengelolaan kegiatan dan peserta">
+              <ActivityManagement accessToken={accessToken} />
+            </section>
           </div>
         )}
       </section>
