@@ -54,6 +54,7 @@ export default function ActivityManagement({ accessToken }) {
   const [editingId, setEditingId] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [updatingRegistrationId, setUpdatingRegistrationId] = useState("");
   const [message, setMessage] = useState("");
   const headers = { Authorization: `Bearer ${accessToken}` };
   const normalizedParticipantSearch = participantSearch.trim().toLocaleLowerCase("id-ID");
@@ -161,6 +162,29 @@ export default function ActivityManagement({ accessToken }) {
       setMessage("Kegiatan dan data pendaftarannya berhasil dihapus.");
     } catch (error) {
       setMessage(error.message);
+    }
+  }
+
+  async function toggleRegistration(activity) {
+    const registrationOpen = !activity.registration_open;
+    setUpdatingRegistrationId(activity.id);
+    setMessage("");
+    try {
+      const updated = await requestJson("/api/activities", {
+        method: "PATCH",
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify({ id: activity.id, registration_open: registrationOpen }),
+      });
+      setActivities((items) => items.map((item) => item.id === updated.id
+        ? { ...item, registration_open: updated.registration_open }
+        : item));
+      setMessage(registrationOpen
+        ? `Pendaftaran kegiatan "${activity.title}" berhasil dibuka.`
+        : `Pendaftaran kegiatan "${activity.title}" berhasil ditutup.`);
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setUpdatingRegistrationId("");
     }
   }
 
@@ -663,6 +687,16 @@ export default function ActivityManagement({ accessToken }) {
                 <div className="admin-news-actions activity-actions">
                   <button className="admin-secondary-button" type="button" onClick={() => downloadCsv(activity, participants, activitySessions, activityAttendance)}>Unduh CSV</button>
                   <button className="admin-secondary-button" type="button" onClick={() => downloadPdf(activity, participants, activitySessions, activityAttendance)}>Unduh PDF</button>
+                  <button
+                    className="admin-secondary-button"
+                    type="button"
+                    disabled={updatingRegistrationId !== ""}
+                    onClick={() => toggleRegistration(activity)}
+                  >
+                    {updatingRegistrationId === activity.id
+                      ? activity.registration_open ? "Menutup..." : "Membuka..."
+                      : activity.registration_open ? "Tutup pendaftaran" : "Buka pendaftaran"}
+                  </button>
                   <button className="admin-secondary-button" type="button" onClick={() => {
                     setEditingId(activity.id);
                     setForm({

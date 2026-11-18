@@ -13,7 +13,7 @@ Website Lontara IoT & Robotic Bootcamps menggunakan Supabase untuk data berita, 
 
 1. Pasang dependensi dengan `npm install`.
 2. Jalankan `npm run dev`, lalu buka `http://localhost:3000`.
-3. Buka `http://localhost:3000/admin`, lalu masuk menggunakan email dan kata sandi akun admin Supabase. Admin dapat membuat kegiatan, melihat, mengedit, menghapus, mencari, memfilter, dan mengubah urutan peserta per kegiatan; mengatur pendaftaran; menambahkan beberapa tanggal absensi; membagikan link check-in per tanggal; serta mengunduh rekap kehadiran PDF/CSV.
+3. Buka `http://localhost:3000/admin`, lalu masuk menggunakan email dan kata sandi akun admin Supabase. Admin dapat membuat kegiatan, menutup atau membuka kembali pendaftaran langsung dari kartu kegiatan, melihat, mengedit, menghapus, mencari, memfilter, dan mengubah urutan peserta per kegiatan; menambahkan beberapa tanggal absensi; membagikan link check-in per tanggal; serta mengunduh rekap kehadiran PDF/CSV.
 4. Tulis judul, ringkasan, isi berita, kategori, tanggal, dan gambar opsional (JPEG/PNG/WebP hingga 5 MB). Artikel yang diterbitkan akan muncul di halaman utama dan memiliki halaman detail sendiri.
 5. Peserta dapat membuka `http://localhost:3000/kegiatan` untuk memilih kegiatan yang pendaftarannya masih dibuka dan mendaftar satu kali, termasuk memilih jenis kelamin. Untuk check-in pada tanggal tertentu, peserta membuka link absensi yang dibagikan admin dan mengisi email serta nomor telepon yang digunakan saat mendaftar.
 

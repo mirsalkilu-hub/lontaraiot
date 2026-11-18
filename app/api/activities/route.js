@@ -108,6 +108,35 @@ export async function PUT(request) {
   return NextResponse.json(data);
 }
 
+export async function PATCH(request) {
+  const auth = await getAdminSupabase(request);
+  if (auth.error) return errorResponse(auth.error, auth.status);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return errorResponse("Data status pendaftaran tidak valid.", 400);
+  }
+  if (!body || typeof body !== "object" || Array.isArray(body) ||
+    typeof body.id !== "string" || !body.id ||
+    typeof body.registration_open !== "boolean") {
+    return errorResponse("ID kegiatan dan status pendaftaran wajib diisi.", 400);
+  }
+
+  const { data, error } = await auth.supabase.from("activities")
+    .update({ registration_open: body.registration_open })
+    .eq("id", body.id)
+    .select("id, registration_open")
+    .maybeSingle();
+  if (error) {
+    console.error("Unable to update activity registration status:", error);
+    return errorResponse("Status pendaftaran gagal diperbarui.");
+  }
+  if (!data) return errorResponse("Kegiatan tidak ditemukan.", 404);
+  return NextResponse.json(data);
+}
+
 export async function DELETE(request) {
   const auth = await getAdminSupabase(request);
   if (auth.error) return errorResponse(auth.error, auth.status);
