@@ -63,7 +63,7 @@ export default function ActivityRegistration() {
         </div>
         <form className="registration-form" onSubmit={submitRegistration}>
           <span className="admin-panel-kicker">FORMULIR PESERTA</span>
-          <h2>Daftar kegiatan</h2>
+          <h2>Pendaftaran kegiatan</h2>
           <p>Pilih salah satu kegiatan yang masih membuka pendaftaran.</p>
           {loading ? <p className="registration-empty" role="status">Memuat daftar kegiatan...</p> : activities.length ? (
             <>
