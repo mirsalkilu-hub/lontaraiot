@@ -96,7 +96,7 @@ export default function ActivityRegistration() {
               <label>Asal sekolah / instansi
                 <input required maxLength={160} autoComplete="organization" value={form.organization} onChange={(event) => setForm({ ...form, organization: event.target.value })} />
               </label>
-              <button className="button button-dark" type="submit" disabled={submitting}>{submitting ? "Mengirim pendaftaran..." : "Daftar kegiatan"} <span>↗</span></button>
+              <button className="button button-dark" type="submit" disabled={submitting}>{submitting ? "Mengirim pendaftaran..." : "Kirim pendaftaran"} <span>↗</span></button>
             </>
           ) : !message?.error ? <p className="registration-empty" role="status">Belum ada kegiatan yang membuka pendaftaran. Silakan kunjungi kembali nanti.</p> : null}
           {message && <p className={message.error ? "registration-message is-error" : "registration-message"} role={message.error ? "alert" : "status"}>{message.text}</p>}
