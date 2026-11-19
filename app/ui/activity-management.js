@@ -38,6 +38,31 @@ function compareParticipantOrder(first, second) {
     first.id.localeCompare(second.id);
 }
 
+function sortParticipants(participants, participantSort) {
+  if (!participantSort || participantSort === "default") {
+    return [...participants].sort(compareParticipantOrder);
+  }
+
+  const sortByOrganization = participantSort.startsWith("organization");
+  const descending = participantSort.endsWith("desc");
+  return [...participants].sort((first, second) => {
+    const firstValue = sortByOrganization
+      ? String(first.organization || "")
+      : String(first.full_name || "");
+    const secondValue = sortByOrganization
+      ? String(second.organization || "")
+      : String(second.full_name || "");
+    const comparison = firstValue.localeCompare(secondValue, "id-ID", { sensitivity: "base" });
+
+    if (comparison !== 0) return descending ? -comparison : comparison;
+    if (sortByOrganization) {
+      const nameComparison = String(first.full_name || "").localeCompare(String(second.full_name || ""), "id-ID", { sensitivity: "base" });
+      if (nameComparison !== 0) return nameComparison;
+    }
+    return compareParticipantOrder(first, second);
+  });
+}
+
 export default function ActivityManagement({ accessToken }) {
   const [activities, setActivities] = useState([]);
   const [registrations, setRegistrations] = useState([]);
@@ -355,6 +380,7 @@ export default function ActivityManagement({ accessToken }) {
   }
 
   function downloadCsv(activity, participants, activitySessions, activityAttendance) {
+    const exportParticipants = sortParticipants(participants, participantSort);
     const columns = [
       "Tanggal absensi",
       "Nama lengkap",
@@ -374,7 +400,7 @@ export default function ActivityManagement({ accessToken }) {
       return `"${text.replace(/"/g, '""')}"`;
     };
     const rows = activitySessions.length
-      ? activitySessions.flatMap((session) => participants.map((participant) => {
+      ? activitySessions.flatMap((session) => exportParticipants.map((participant) => {
         const record = activityAttendance.find((item) => item.session_id === session.id && item.registration_id === participant.id);
         return [
           session.session_date,
@@ -390,7 +416,7 @@ export default function ActivityManagement({ accessToken }) {
           record?.marked_at ? new Date(record.marked_at).toLocaleString("id-ID") : "",
         ];
       }))
-      : participants.map((participant) => [
+      : exportParticipants.map((participant) => [
         "Belum ada tanggal absensi",
         participant.full_name,
         participant.gender,
@@ -418,6 +444,7 @@ export default function ActivityManagement({ accessToken }) {
   async function downloadPdf(activity, participants, activitySessions, activityAttendance) {
     setMessage("");
     try {
+      const exportParticipants = sortParticipants(participants, participantSort);
       const [{ jsPDF }, { default: autoTable }] = await Promise.all([
         import("jspdf"),
         import("jspdf-autotable"),
@@ -432,7 +459,7 @@ export default function ActivityManagement({ accessToken }) {
       const paleBlue = [243, 246, 251];
       const orderedSessions = [...activitySessions].sort((a, b) => a.session_date.localeCompare(b.session_date));
       const rows = orderedSessions.length
-        ? orderedSessions.flatMap((session) => participants.map((participant, index) => {
+        ? orderedSessions.flatMap((session) => exportParticipants.map((participant, index) => {
           const record = activityAttendance.find((item) => item.session_id === session.id && item.registration_id === participant.id);
           return [
             String(index + 1),
@@ -445,7 +472,7 @@ export default function ActivityManagement({ accessToken }) {
             record?.attended ? "HADIR" : "BELUM HADIR",
           ];
         }))
-        : participants.map((participant, index) => [
+        : exportParticipants.map((participant, index) => [
           String(index + 1),
           "Belum dijadwalkan",
           participant.full_name,
