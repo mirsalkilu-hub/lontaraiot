@@ -34,13 +34,11 @@ export async function POST(request) {
 
   try {
     const supabase = createSupabaseServerClient();
-    const today = new Date().toISOString().slice(0, 10);
     const { data: activity, error: activityError } = await supabase
       .from("activities")
       .select("id")
       .eq("id", body.activity_id)
       .eq("registration_open", true)
-      .gte("activity_date", today)
       .maybeSingle();
     if (activityError) throw activityError;
     if (!activity) return errorResponse("Kegiatan tidak tersedia atau pendaftarannya sudah ditutup.", 409);

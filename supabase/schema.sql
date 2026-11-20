@@ -177,7 +177,6 @@ create policy "Participants can register for open activities"
       from public.activities
       where activities.id = activity_id
         and activities.registration_open
-        and activities.activity_date >= current_date
     )
   );
 

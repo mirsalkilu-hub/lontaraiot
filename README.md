@@ -5,7 +5,7 @@ Website Lontara IoT & Robotic Bootcamps menggunakan Supabase untuk data berita, 
 ### Persiapan Supabase
 
 1. Buat proyek Supabase.
-2. Jalankan `supabase/schema.sql` melalui SQL Editor untuk membuat tabel, indeks, bucket gambar publik, dan kebijakan Row Level Security. Skrip aman dijalankan ulang dan menambahkan kolom yang diperlukan jika tabel lama belum memilikinya. Berita lama tetap dipertahankan; pendaftaran peserta tetap satu kali per kegiatan, sementara `activity_sessions` dan `attendance_records` menyimpan tanggal serta status absensi per sesi. Status absensi lama dipindahkan ke tanggal kegiatan utama dan urutan awal peserta disusun berdasarkan waktu pendaftaran.
+2. Jalankan `supabase/schema.sql` melalui SQL Editor untuk membuat tabel, indeks, bucket gambar publik, dan kebijakan Row Level Security. Skrip aman dijalankan ulang dan menambahkan kolom yang diperlukan jika tabel lama belum memilikinya. Jalankan ulang skrip ini setelah pembaruan skema agar kebijakan database ikut diperbarui. Berita lama tetap dipertahankan; pendaftaran peserta tetap satu kali per kegiatan, sementara `activity_sessions` dan `attendance_records` menyimpan tanggal serta status absensi per sesi. Status absensi lama dipindahkan ke tanggal kegiatan utama dan urutan awal peserta disusun berdasarkan waktu pendaftaran.
 3. Buat akun pengguna melalui **Authentication → Users**. Matikan pendaftaran publik di pengaturan **Authentication → Sign In / Providers**.
 4. Salin `.env.example` menjadi `.env.local`, lalu isi URL proyek dan publishable/anon key dari **Project Settings → API Keys**. Untuk memberikan peran admin, ikuti bagian [Menambahkan admin](#menambahkan-admin).
 
@@ -15,7 +15,7 @@ Website Lontara IoT & Robotic Bootcamps menggunakan Supabase untuk data berita, 
 2. Jalankan `npm run dev`, lalu buka `http://localhost:3000`.
 3. Buka `http://localhost:3000/admin`, lalu masuk menggunakan email dan kata sandi akun admin Supabase. Dashboard memisahkan pengelolaan berita dari kegiatan dan peserta. Admin dapat membuat kegiatan, menutup atau membuka kembali pendaftaran langsung dari kartu kegiatan, mencari dan memfilter peserta (10 peserta per halaman), mengurutkan peserta berdasarkan nama atau sekolah/instansi, serta mengubah urutan manual; menambahkan beberapa tanggal absensi; membagikan link check-in per tanggal; dan mengunduh rekap kehadiran PDF/CSV.
 4. Tulis judul, ringkasan, isi berita, kategori, tanggal, dan gambar opsional (JPEG/PNG/WebP hingga 5 MB). Artikel yang diterbitkan akan muncul di halaman utama dan memiliki halaman detail sendiri.
-5. Peserta dapat membuka `http://localhost:3000/kegiatan` untuk memilih kegiatan yang pendaftarannya masih dibuka dan mendaftar satu kali, termasuk memilih jenis kelamin. Untuk check-in pada tanggal tertentu, peserta membuka link absensi yang dibagikan admin dan mengisi email serta nomor telepon yang digunakan saat mendaftar.
+5. Peserta dapat membuka `http://localhost:3000/kegiatan` untuk memilih kegiatan yang pendaftarannya masih dibuka dan mendaftar satu kali, termasuk memilih jenis kelamin. Pendaftaran tetap terbuka tanpa batas tanggal sampai admin menutupnya dari kartu kegiatan. Untuk check-in pada tanggal tertentu, peserta membuka link absensi yang dibagikan admin dan mengisi email serta nomor telepon yang digunakan saat mendaftar.
 
 ### Menambahkan admin
 

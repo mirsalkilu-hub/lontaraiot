@@ -15,7 +15,7 @@ export default function ActivityRegistration() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/activities").then(async (response) => {
+    fetch("/api/activities", { cache: "no-store" }).then(async (response) => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Kegiatan tidak dapat dimuat.");
       if (active) {

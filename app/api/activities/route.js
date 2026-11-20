@@ -45,8 +45,7 @@ export async function GET(request) {
       query = auth.supabase.from("activities")
         .select("id, title, activity_type, description, activity_date, location, registration_open");
     } else {
-      query = query.eq("registration_open", true)
-        .gte("activity_date", new Date().toISOString().slice(0, 10));
+      query = query.eq("registration_open", true);
     }
     const { data, error } = await query.order("activity_date", { ascending: true });
     if (error) throw error;

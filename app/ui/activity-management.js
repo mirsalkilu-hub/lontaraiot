@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getJakartaDate } from "../../lib/date";
 
-const today = new Date().toISOString().slice(0, 10);
+const today = getJakartaDate();
 const emptyActivity = {
   title: "",
   activity_type: "",
@@ -767,7 +768,9 @@ export default function ActivityManagement({ accessToken }) {
                   <span>{activity.activity_type} · Kegiatan utama {formatDate(activity.activity_date)} · {activity.location}</span>
                   <h3>{activity.title}</h3>
                   <p>{activity.description}</p>
-                  <span className={activity.registration_open ? "activity-status is-open" : "activity-status"}>{activity.registration_open ? "Pendaftaran dibuka" : "Pendaftaran ditutup"} · {participants.length} peserta · {activitySessions.length} tanggal absensi · {presentCount} check-in</span>
+                  <span className={activity.registration_open ? "activity-status is-open" : "activity-status"}>
+                    {activity.registration_open ? "Pendaftaran dibuka" : "Pendaftaran ditutup"} · {participants.length} peserta · {activitySessions.length} tanggal absensi · {presentCount} check-in
+                  </span>
                 </div>
                 <div className="admin-news-actions activity-actions">
                   <button className="admin-secondary-button" type="button" onClick={() => downloadCsv(activity, participants, activitySessions, activityAttendance)}>Unduh CSV</button>
