@@ -465,6 +465,13 @@ export default function ActivityManagement({ accessToken }) {
       const orderedSessions = selectedSession
         ? [selectedSession]
         : [...activitySessions].sort((a, b) => a.session_date.localeCompare(b.session_date));
+      const attendanceDates = orderedSessions.length
+        ? orderedSessions.map((session) => formatDate(session.session_date)).join(", ")
+        : "Belum dijadwalkan";
+      const attendanceDateLines = doc.splitTextToSize(
+        `TANGGAL ABSENSI  ${attendanceDates}`,
+        pageWidth - 28,
+      );
       const rows = orderedSessions.length
         ? orderedSessions.flatMap((session) => exportParticipants.map((participant, index) => {
           const record = activityAttendance.find((item) => item.session_id === session.id && item.registration_id === participant.id);
@@ -517,17 +524,19 @@ export default function ActivityManagement({ accessToken }) {
       doc.setFont("helvetica", "bold");
       doc.setFontSize(9);
       doc.text(`PESERTA  ${participants.length}`, 14, headerHeight + 9);
-      doc.text(`TANGGAL ABSENSI  ${orderedSessions.length}`, 64, headerHeight + 9);
-      doc.text(`KEHADIRAN  ${presentCount} / ${expectedCount}`, 132, headerHeight + 9);
+      doc.text(`KEHADIRAN  ${presentCount} / ${expectedCount}`, 64, headerHeight + 9);
       doc.setTextColor(100, 117, 140);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8);
       doc.text(`Dibuat ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}`, pageWidth - 14, headerHeight + 9, { align: "right" });
+      doc.setTextColor(...navy);
+      doc.setFont("helvetica", "bold");
+      doc.text(attendanceDateLines, 14, headerHeight + 17);
 
       autoTable(doc, {
         head: [["NO.", "TANGGAL ABSENSI", "NAMA PESERTA", "JENIS KELAMIN", "EMAIL", "TELEPON", "SEKOLAH / INSTANSI", "STATUS"]],
         body: rows,
-        startY: headerHeight + 14,
+        startY: headerHeight + 20 + attendanceDateLines.length * 4,
         margin: { top: 17, right: 14, bottom: 14, left: 14 },
         theme: "grid",
         styles: { font: "helvetica", fontSize: 8, cellPadding: 3, textColor: navy, lineColor: [220, 228, 240], lineWidth: 0.15, overflow: "linebreak" },
