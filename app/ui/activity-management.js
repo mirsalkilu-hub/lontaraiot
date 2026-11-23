@@ -380,7 +380,7 @@ export default function ActivityManagement({ accessToken }) {
     }
   }
 
-  function downloadCsv(activity, participants, activitySessions, activityAttendance) {
+  function downloadCsv(activity, participants, activitySessions, activityAttendance, selectedSession = null) {
     const exportParticipants = sortParticipants(participants, participantSort);
     const columns = [
       "Tanggal absensi",
@@ -400,8 +400,11 @@ export default function ActivityManagement({ accessToken }) {
       if (/^[\u0000-\u0020]*[=+\-@]/.test(text)) text = `'${text}`;
       return `"${text.replace(/"/g, '""')}"`;
     };
-    const rows = activitySessions.length
-      ? activitySessions.flatMap((session) => exportParticipants.map((participant) => {
+    const exportSessions = selectedSession
+      ? [selectedSession]
+      : activitySessions;
+    const rows = exportSessions.length
+      ? exportSessions.flatMap((session) => exportParticipants.map((participant) => {
         const record = activityAttendance.find((item) => item.session_id === session.id && item.registration_id === participant.id);
         return [
           session.session_date,
@@ -435,14 +438,15 @@ export default function ActivityManagement({ accessToken }) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `rekap-absensi-${safeFilename(activity.title)}.csv`;
+    const dateSuffix = selectedSession ? `-${selectedSession.session_date}` : "";
+    link.download = `rekap-absensi-${safeFilename(activity.title)}${dateSuffix}.csv`;
     document.body.appendChild(link);
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  async function downloadPdf(activity, participants, activitySessions, activityAttendance) {
+  async function downloadPdf(activity, participants, activitySessions, activityAttendance, selectedSession = null) {
     setMessage("");
     try {
       const exportParticipants = sortParticipants(participants, participantSort);
@@ -458,7 +462,9 @@ export default function ActivityManagement({ accessToken }) {
       const navy = [16, 47, 94];
       const orange = [232, 135, 0];
       const paleBlue = [243, 246, 251];
-      const orderedSessions = [...activitySessions].sort((a, b) => a.session_date.localeCompare(b.session_date));
+      const orderedSessions = selectedSession
+        ? [selectedSession]
+        : [...activitySessions].sort((a, b) => a.session_date.localeCompare(b.session_date));
       const rows = orderedSessions.length
         ? orderedSessions.flatMap((session) => exportParticipants.map((participant, index) => {
           const record = activityAttendance.find((item) => item.session_id === session.id && item.registration_id === participant.id);
@@ -544,7 +550,8 @@ export default function ActivityManagement({ accessToken }) {
           doc.text(`Halaman ${data.pageNumber}`, pageWidth - 14, pageHeight - 6, { align: "right" });
         },
       });
-      doc.save(`rekap-absensi-${safeFilename(activity.title)}.pdf`);
+      const dateSuffix = selectedSession ? `-${selectedSession.session_date}` : "";
+      doc.save(`rekap-absensi-${safeFilename(activity.title)}${dateSuffix}.pdf`);
     } catch (error) {
       console.error("Unable to generate attendance PDF:", error);
       setMessage(error.message || "PDF rekap absensi gagal dibuat.");
@@ -773,8 +780,8 @@ export default function ActivityManagement({ accessToken }) {
                   </span>
                 </div>
                 <div className="admin-news-actions activity-actions">
-                  <button className="admin-secondary-button" type="button" onClick={() => downloadCsv(activity, participants, activitySessions, activityAttendance)}>Unduh CSV</button>
-                  <button className="admin-secondary-button" type="button" onClick={() => downloadPdf(activity, participants, activitySessions, activityAttendance)}>Unduh PDF</button>
+                  <button className="admin-secondary-button" type="button" onClick={() => downloadCsv(activity, participants, activitySessions, activityAttendance)}>Unduh CSV semua tanggal</button>
+                  <button className="admin-secondary-button" type="button" onClick={() => downloadPdf(activity, participants, activitySessions, activityAttendance)}>Unduh PDF semua tanggal</button>
                   <button
                     className="admin-secondary-button"
                     type="button"
@@ -831,6 +838,8 @@ export default function ActivityManagement({ accessToken }) {
                               <span>{sessionPresent} dari {participants.length} hadir</span>
                             </div>
                             <div className="activity-session-actions">
+                              <button className="admin-secondary-button" type="button" onClick={() => downloadCsv(activity, participants, [session], sessionRecords, session)}>CSV tanggal ini</button>
+                              <button className="admin-secondary-button" type="button" onClick={() => downloadPdf(activity, participants, [session], sessionRecords, session)}>PDF tanggal ini</button>
                               <button className="admin-secondary-button" type="button" onClick={() => shareCheckin(session)}>Salin link absen</button>
                               <button className="admin-secondary-button" type="button" onClick={() => toggleCheckin(session)}>{session.checkin_open ? "Tutup check-in" : "Buka check-in"}</button>
                               <button className="admin-secondary-button admin-delete-button" type="button" onClick={() => removeAttendanceDate(session)}>Hapus tanggal</button>
