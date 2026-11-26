@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getAdminSupabase } from "../../../lib/supabase/server";
-import { getNews, imageBucket, normalizeInstagramUrl } from "../../../lib/supabase/news";
+import { getNews, imageBucket, normalizeInstagramUrl, normalizeYouTubeUrl } from "../../../lib/supabase/news";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -64,10 +64,12 @@ export async function POST(request) {
   const date = formData.get("date");
   const image = formData.get("image");
   const instagramUrl = normalizeInstagramUrl(formData.get("instagramUrl"));
+  const youtubeUrl = normalizeYouTubeUrl(formData.get("youtubeUrl"));
 
   if (instagramUrl === null) {
     return errorResponse("Link Instagram harus berupa URL HTTPS untuk postingan, Reel, atau IGTV.", 400);
   }
+  if (youtubeUrl === null) return errorResponse("Link YouTube tidak valid. Gunakan link video atau Shorts HTTPS.", 400);
   if (typeof title !== "string" || !title.trim() || title.trim().length > 120 ||
     typeof category !== "string" || !allowedCategories.includes(category) ||
     typeof excerpt !== "string" || !excerpt.trim() || excerpt.trim().length > 220 ||
@@ -110,6 +112,7 @@ export async function POST(request) {
       published_at: date,
       image_path: imagePath,
       instagram_url: instagramUrl || null,
+      youtube_url: youtubeUrl || null,
       author_id: auth.user.id,
     };
     const { error } = await supabase.from("posts").insert(post);
@@ -152,11 +155,13 @@ export async function PUT(request) {
   const date = formData.get("date");
   const image = formData.get("image");
   const instagramUrl = normalizeInstagramUrl(formData.get("instagramUrl"));
+  const youtubeUrl = normalizeYouTubeUrl(formData.get("youtubeUrl"));
   const removeImage = formData.get("removeImage") === "true";
 
   if (instagramUrl === null) {
     return errorResponse("Link Instagram harus berupa URL HTTPS untuk postingan, Reel, atau IGTV.", 400);
   }
+  if (youtubeUrl === null) return errorResponse("Link YouTube tidak valid. Gunakan link video atau Shorts HTTPS.", 400);
   if (typeof id !== "string" || !id ||
     typeof title !== "string" || !title.trim() || title.trim().length > 120 ||
     typeof category !== "string" || !allowedCategories.includes(category) ||
@@ -214,6 +219,7 @@ export async function PUT(request) {
         published_at: date,
         image_path: imagePath,
         instagram_url: instagramUrl || null,
+        youtube_url: youtubeUrl || null,
       })
       .eq("id", id);
     if (error) throw error;

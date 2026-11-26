@@ -11,6 +11,7 @@ const blankNews = {
   excerpt: "",
   content: "",
   instagramUrl: "",
+  youtubeUrl: "",
   date: new Date().toISOString().slice(0, 10),
 };
 
@@ -151,6 +152,7 @@ export default function AdminPanel() {
       excerpt: item.excerpt,
       content: item.content,
       instagramUrl: item.instagramUrl || "",
+      youtubeUrl: item.youtubeUrl || "",
       date: item.date,
     });
     setImageFile(null);
@@ -350,6 +352,15 @@ export default function AdminPanel() {
                   value={form.instagramUrl}
                   onChange={(event) => setForm({ ...form, instagramUrl: event.target.value })}
                   placeholder="https://www.instagram.com/p/..."
+                />
+              </label>
+              <label><span className="admin-label-row"><span>Link video YouTube</span><span className="image-help">Opsional · Video, Shorts, atau link youtu.be</span></span>
+                <input
+                  type="url"
+                  maxLength={500}
+                  value={form.youtubeUrl}
+                  onChange={(event) => setForm({ ...form, youtubeUrl: event.target.value })}
+                  placeholder="https://www.youtube.com/watch?v=..."
                 />
               </label>
               <label><span className="admin-label-row"><span>Gambar berita</span><span className="image-help">Opsional · JPEG, PNG, atau WebP · Maksimal 5 MB</span></span>

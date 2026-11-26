@@ -11,6 +11,10 @@ create table if not exists public.posts (
     instagram_url is null
     or instagram_url ~ '^https://www[.]instagram[.]com/(p|reel|tv)/[A-Za-z0-9_-]+/$'
   ),
+  youtube_url text check (
+    youtube_url is null
+    or youtube_url ~ '^https://www[.]youtube[.]com/watch[?]v=[A-Za-z0-9_-]{11}$'
+  ),
   author_id uuid not null references auth.users(id) on delete restrict,
   created_at timestamptz not null default now()
 );
@@ -20,6 +24,9 @@ alter table public.posts
 
 alter table public.posts
   add column if not exists instagram_url text;
+
+alter table public.posts
+  add column if not exists youtube_url text;
 
 do $$
 begin
@@ -34,6 +41,24 @@ begin
       check (
         instagram_url is null
         or instagram_url ~ '^https://www[.]instagram[.]com/(p|reel|tv)/[A-Za-z0-9_-]+/$'
+      );
+  end if;
+end;
+$$;
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'posts_youtube_url_check'
+      and conrelid = 'public.posts'::regclass
+  ) then
+    alter table public.posts
+      add constraint posts_youtube_url_check
+      check (
+        youtube_url is null
+        or youtube_url ~ '^https://www[.]youtube[.]com/watch[?]v=[A-Za-z0-9_-]{11}$'
       );
   end if;
 end;

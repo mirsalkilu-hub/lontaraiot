@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import SiteFooter from "./site-footer";
 import SiteHeader from "./site-header";
+import NewsCards from "./news-cards";
 
 const values = [
   { number: "01", title: "Pembelajaran", description: "Belajar dengan praktik, eksplorasi, dan rasa ingin tahu." },
@@ -77,40 +78,14 @@ function NewsSection({ news, error }) {
           />
         </div>
       )}
-      {error ? <p className="empty-news" role="status">{error}</p> : latestNews.length ? filteredNews.length ? <div className="news-grid">
-        {filteredNews.map((item, index) => (
-          <article className={`news-card news-card-${index + 1}`} key={item.id} data-reveal="up" style={{ "--reveal-delay": `${index * 110}ms` }}>
-            {item.instagramEmbedUrl ? (
-              <div className="news-art news-art-with-instagram">
-                <div className="news-instagram-topline"><span>INSTAGRAM / REEL</span><span aria-hidden="true">↗</span></div>
-                <iframe
-                  src={`${item.instagramEmbedUrl}?autoplay=1&mute=1`}
-                  title={`Postingan Instagram: ${item.title}`}
-                  loading="lazy"
-                  allow="autoplay; encrypted-media; picture-in-picture"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                />
-              </div>
-            ) : item.imageUrl ? (
-              <a className="news-art news-art-link news-art-with-photo" href={`/berita/${encodeURIComponent(item.slug)}`} aria-label={`Baca berita: ${item.title}`}>
-                <span className="news-photo-backdrop" style={{ backgroundImage: `url("${item.imageUrl}")` }} aria-hidden="true" />
-                <img className="news-photo" src={item.imageUrl} alt="" />
-                <span className="news-art-index">0{index + 1}</span><span className="news-art-caption">LONTARA / JOURNAL</span>
-              </a>
-            ) : (
-              <a className="news-art news-art-link" href={`/berita/${encodeURIComponent(item.slug)}`} aria-label={`Baca berita: ${item.title}`}>
-                <span className="news-art-shape">{index === 0 ? "⌘" : index === 1 ? "◈" : "✳"}</span>
-                <span className="news-art-index">0{index + 1}</span><span className="news-art-caption">LONTARA / JOURNAL</span>
-              </a>
-            )}
-            <a className="news-copy-link" href={`/berita/${encodeURIComponent(item.slug)}`} aria-label={`Baca berita: ${item.title}`}>
-              <div className="news-copy"><div className="news-meta"><span>{item.category}</span><time dateTime={item.date}>{new Date(`${item.date}T00:00:00`).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}</time></div><h3>{item.title}</h3><p>{item.excerpt}</p><span className="news-read-more">Baca selengkapnya <ArrowIcon /></span></div>
-            </a>
-          </article>
-        ))}
-      </div> : <p className="empty-news" role="status">Tidak ada berita yang cocok dengan pencarian.</p> : <p className="empty-news">Berita baru sedang disiapkan. Kunjungi lagi segera!</p>}
-      <a className="text-link" href="/admin">Kelola berita <ArrowIcon /></a>
+      {error ? <p className="empty-news" role="status">{error}</p> : latestNews.length ? filteredNews.length
+        ? <NewsCards items={filteredNews} reveal autoplay />
+        : <p className="empty-news" role="status">Tidak ada berita yang cocok dengan pencarian.</p>
+        : <p className="empty-news">Berita baru sedang disiapkan. Kunjungi lagi segera!</p>}
+      <div className="news-section-actions">
+        <a className="text-link news-view-all" href="/berita">Lihat semua berita <ArrowIcon /></a>
+        <a className="text-link" href="/admin">Kelola berita <ArrowIcon /></a>
+      </div>
     </section>
   );
 }

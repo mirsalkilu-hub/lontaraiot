@@ -54,12 +54,30 @@ export default async function NewsArticlePage({ params }) {
           <h1>{article.title}</h1>
           <p className="article-excerpt">{article.excerpt}</p>
         </header>
-        {(article.imageUrl || article.instagramEmbedUrl) && (
+        {(article.imageUrl || article.youtubeEmbedUrl || article.instagramEmbedUrl) && (
           <section className="article-media" aria-label="Media berita">
             {article.imageUrl && (
               <figure className="article-image-wrap">
+                <span
+                  className="article-image-backdrop"
+                  style={{ backgroundImage: `url("${article.imageUrl}")` }}
+                  aria-hidden="true"
+                />
                 <img className="article-image" src={article.imageUrl} alt={article.title} />
               </figure>
+            )}
+            {article.youtubeEmbedUrl && (
+              <div className="article-youtube-wrap">
+                <iframe
+                  className="article-youtube-embed"
+                  src={article.youtubeEmbedUrl}
+                  title={`Video YouTube: ${article.title}`}
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+              </div>
             )}
             {article.instagramEmbedUrl && (
               <div className="article-instagram-wrap">
