@@ -82,6 +82,7 @@ function NewsSection({ news, error }) {
           <article className={`news-card news-card-${index + 1}`} key={item.id} data-reveal="up" style={{ "--reveal-delay": `${index * 110}ms` }}>
             {item.instagramEmbedUrl ? (
               <div className="news-art news-art-with-instagram">
+                <div className="news-instagram-topline"><span>INSTAGRAM / REEL</span><span aria-hidden="true">↗</span></div>
                 <iframe
                   src={`${item.instagramEmbedUrl}?autoplay=1&mute=1`}
                   title={`Postingan Instagram: ${item.title}`}
@@ -91,9 +92,15 @@ function NewsSection({ news, error }) {
                   allowFullScreen
                 />
               </div>
+            ) : item.imageUrl ? (
+              <a className="news-art news-art-link news-art-with-photo" href={`/berita/${encodeURIComponent(item.slug)}`} aria-label={`Baca berita: ${item.title}`}>
+                <span className="news-photo-backdrop" style={{ backgroundImage: `url("${item.imageUrl}")` }} aria-hidden="true" />
+                <img className="news-photo" src={item.imageUrl} alt="" />
+                <span className="news-art-index">0{index + 1}</span><span className="news-art-caption">LONTARA / JOURNAL</span>
+              </a>
             ) : (
-              <a className={item.imageUrl ? "news-art news-art-link news-art-with-photo" : "news-art news-art-link"} href={`/berita/${encodeURIComponent(item.slug)}`} aria-label={`Baca berita: ${item.title}`}>
-                {item.imageUrl ? <img className="news-photo" src={item.imageUrl} alt="" /> : <span className="news-art-shape">{index === 0 ? "⌘" : index === 1 ? "◈" : "✳"}</span>}
+              <a className="news-art news-art-link" href={`/berita/${encodeURIComponent(item.slug)}`} aria-label={`Baca berita: ${item.title}`}>
+                <span className="news-art-shape">{index === 0 ? "⌘" : index === 1 ? "◈" : "✳"}</span>
                 <span className="news-art-index">0{index + 1}</span><span className="news-art-caption">LONTARA / JOURNAL</span>
               </a>
             )}
