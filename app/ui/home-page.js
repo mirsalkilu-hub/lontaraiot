@@ -53,7 +53,6 @@ function PartnerLogos() {
 function NewsSection({ news, error }) {
   const [search, setSearch] = useState("");
   const latestNews = news.slice(0, 6);
-  const instagramFeature = latestNews.find((item) => item.instagramEmbedUrl);
   const normalizedSearch = search.trim().toLocaleLowerCase("id-ID");
   const filteredNews = latestNews.filter((item) =>
     [item.title, item.category, item.excerpt, item.date]
@@ -78,33 +77,27 @@ function NewsSection({ news, error }) {
           />
         </div>
       )}
-      {!error && instagramFeature && (
-        <aside className="instagram-featured" aria-label="Sorotan Instagram terbaru">
-          <div className="instagram-featured-copy">
-            <p className="eyebrow"><span className="eyebrow-line" /> INSTAGRAM / TERBARU</p>
-            <h3>{instagramFeature.title}</h3>
-            <p>{instagramFeature.excerpt}</p>
-            <a className="text-link" href={`/berita/${encodeURIComponent(instagramFeature.slug)}`}>
-              Baca berita lengkap <ArrowIcon />
-            </a>
-          </div>
-          <div className="instagram-featured-frame">
-            <iframe
-              src={`${instagramFeature.instagramEmbedUrl}?autoplay=1&mute=1`}
-              title={`Postingan Instagram: ${instagramFeature.title}`}
-              loading="lazy"
-              allow="autoplay; encrypted-media; picture-in-picture"
-              referrerPolicy="strict-origin-when-cross-origin"
-              allowFullScreen
-            />
-          </div>
-        </aside>
-      )}
       {error ? <p className="empty-news" role="status">{error}</p> : latestNews.length ? filteredNews.length ? <div className="news-grid">
         {filteredNews.map((item, index) => (
           <article className={`news-card news-card-${index + 1}`} key={item.id} data-reveal="up" style={{ "--reveal-delay": `${index * 110}ms` }}>
-            <a className="news-card-link" href={`/berita/${encodeURIComponent(item.slug)}`} aria-label={`Baca berita: ${item.title}`}>
-              <div className={item.imageUrl ? "news-art news-art-with-photo" : "news-art"}>{item.imageUrl ? <img className="news-photo" src={item.imageUrl} alt="" /> : <span className="news-art-shape">{index === 0 ? "⌘" : index === 1 ? "◈" : "✳"}</span>}<span className="news-art-index">0{index + 1}</span><span className="news-art-caption">LONTARA / JOURNAL</span></div>
+            {item.instagramEmbedUrl ? (
+              <div className="news-art news-art-with-instagram">
+                <iframe
+                  src={`${item.instagramEmbedUrl}?autoplay=1&mute=1`}
+                  title={`Postingan Instagram: ${item.title}`}
+                  loading="lazy"
+                  allow="autoplay; encrypted-media; picture-in-picture"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+              </div>
+            ) : (
+              <a className={item.imageUrl ? "news-art news-art-link news-art-with-photo" : "news-art news-art-link"} href={`/berita/${encodeURIComponent(item.slug)}`} aria-label={`Baca berita: ${item.title}`}>
+                {item.imageUrl ? <img className="news-photo" src={item.imageUrl} alt="" /> : <span className="news-art-shape">{index === 0 ? "⌘" : index === 1 ? "◈" : "✳"}</span>}
+                <span className="news-art-index">0{index + 1}</span><span className="news-art-caption">LONTARA / JOURNAL</span>
+              </a>
+            )}
+            <a className="news-copy-link" href={`/berita/${encodeURIComponent(item.slug)}`} aria-label={`Baca berita: ${item.title}`}>
               <div className="news-copy"><div className="news-meta"><span>{item.category}</span><time dateTime={item.date}>{new Date(`${item.date}T00:00:00`).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}</time></div><h3>{item.title}</h3><p>{item.excerpt}</p><span className="news-read-more">Baca selengkapnya <ArrowIcon /></span></div>
             </a>
           </article>
