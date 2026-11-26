@@ -7,12 +7,37 @@ create table if not exists public.posts (
   content text not null check (char_length(content) between 1 and 50000),
   published_at date not null default current_date,
   image_path text,
+  instagram_url text check (
+    instagram_url is null
+    or instagram_url ~ '^https://www[.]instagram[.]com/(p|reel|tv)/[A-Za-z0-9_-]+/$'
+  ),
   author_id uuid not null references auth.users(id) on delete restrict,
   created_at timestamptz not null default now()
 );
 
 alter table public.posts
   add column if not exists published_at date not null default current_date;
+
+alter table public.posts
+  add column if not exists instagram_url text;
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'posts_instagram_url_check'
+      and conrelid = 'public.posts'::regclass
+  ) then
+    alter table public.posts
+      add constraint posts_instagram_url_check
+      check (
+        instagram_url is null
+        or instagram_url ~ '^https://www[.]instagram[.]com/(p|reel|tv)/[A-Za-z0-9_-]+/$'
+      );
+  end if;
+end;
+$$;
 
 alter table public.posts
   add column if not exists author_id uuid references auth.users(id) on delete restrict;

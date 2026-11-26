@@ -59,6 +59,17 @@ export default async function NewsArticlePage({ params }) {
             <img className="article-image" src={article.imageUrl} alt={article.title} />
           </figure>
         )}
+        {article.instagramEmbedUrl && (
+          <div className="article-instagram-wrap">
+            <iframe
+              className="article-instagram-embed"
+              src={article.instagramEmbedUrl}
+              title={`Postingan Instagram: ${article.title}`}
+              loading="lazy"
+              allowFullScreen
+            />
+          </div>
+        )}
         <div className="article-body">
           {article.content.split(/\n\s*\n/).map((paragraph, index) => (
             <p key={`${index}-${paragraph.slice(0, 20)}`}>{paragraph}</p>

@@ -10,6 +10,7 @@ const blankNews = {
   category: "Program",
   excerpt: "",
   content: "",
+  instagramUrl: "",
   date: new Date().toISOString().slice(0, 10),
 };
 
@@ -149,6 +150,7 @@ export default function AdminPanel() {
       category: item.category,
       excerpt: item.excerpt,
       content: item.content,
+      instagramUrl: item.instagramUrl || "",
       date: item.date,
     });
     setImageFile(null);
@@ -340,6 +342,15 @@ export default function AdminPanel() {
               </label>
               <label><span className="admin-label-row"><span>Isi berita</span><span className="image-help">{form.content.length}/50.000 karakter</span></span>
                 <textarea required maxLength={50000} rows={12} value={form.content} onChange={(event) => setForm({ ...form, content: event.target.value })} placeholder="Ceritakan informasi secara lengkap..." />
+              </label>
+              <label><span className="admin-label-row"><span>Link postingan Instagram</span><span className="image-help">Opsional · Post, Reel, atau IGTV</span></span>
+                <input
+                  type="url"
+                  maxLength={500}
+                  value={form.instagramUrl}
+                  onChange={(event) => setForm({ ...form, instagramUrl: event.target.value })}
+                  placeholder="https://www.instagram.com/p/..."
+                />
               </label>
               <label><span className="admin-label-row"><span>Gambar berita</span><span className="image-help">Opsional · JPEG, PNG, atau WebP · Maksimal 5 MB</span></span>
                 <input

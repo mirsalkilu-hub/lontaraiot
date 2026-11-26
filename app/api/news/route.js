@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getAdminSupabase } from "../../../lib/supabase/server";
-import { getNews, imageBucket } from "../../../lib/supabase/news";
+import { getNews, imageBucket, normalizeInstagramUrl } from "../../../lib/supabase/news";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -63,7 +63,11 @@ export async function POST(request) {
   const content = formData.get("content");
   const date = formData.get("date");
   const image = formData.get("image");
+  const instagramUrl = normalizeInstagramUrl(formData.get("instagramUrl"));
 
+  if (instagramUrl === null) {
+    return errorResponse("Link Instagram harus berupa URL HTTPS untuk postingan, Reel, atau IGTV.", 400);
+  }
   if (typeof title !== "string" || !title.trim() || title.trim().length > 120 ||
     typeof category !== "string" || !allowedCategories.includes(category) ||
     typeof excerpt !== "string" || !excerpt.trim() || excerpt.trim().length > 220 ||
@@ -105,6 +109,7 @@ export async function POST(request) {
       content: content.trim(),
       published_at: date,
       image_path: imagePath,
+      instagram_url: instagramUrl || null,
       author_id: auth.user.id,
     };
     const { error } = await supabase.from("posts").insert(post);
@@ -146,8 +151,12 @@ export async function PUT(request) {
   const content = formData.get("content");
   const date = formData.get("date");
   const image = formData.get("image");
+  const instagramUrl = normalizeInstagramUrl(formData.get("instagramUrl"));
   const removeImage = formData.get("removeImage") === "true";
 
+  if (instagramUrl === null) {
+    return errorResponse("Link Instagram harus berupa URL HTTPS untuk postingan, Reel, atau IGTV.", 400);
+  }
   if (typeof id !== "string" || !id ||
     typeof title !== "string" || !title.trim() || title.trim().length > 120 ||
     typeof category !== "string" || !allowedCategories.includes(category) ||
@@ -204,6 +213,7 @@ export async function PUT(request) {
         content: content.trim(),
         published_at: date,
         image_path: imagePath,
+        instagram_url: instagramUrl || null,
       })
       .eq("id", id);
     if (error) throw error;
