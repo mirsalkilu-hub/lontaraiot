@@ -54,21 +54,27 @@ export default async function NewsArticlePage({ params }) {
           <h1>{article.title}</h1>
           <p className="article-excerpt">{article.excerpt}</p>
         </header>
-        {article.imageUrl && (
-          <figure className="article-image-wrap">
-            <img className="article-image" src={article.imageUrl} alt={article.title} />
-          </figure>
-        )}
-        {article.instagramEmbedUrl && (
-          <div className="article-instagram-wrap">
-            <iframe
-              className="article-instagram-embed"
-              src={article.instagramEmbedUrl}
-              title={`Postingan Instagram: ${article.title}`}
-              loading="lazy"
-              allowFullScreen
-            />
-          </div>
+        {(article.imageUrl || article.instagramEmbedUrl) && (
+          <section className="article-media" aria-label="Media berita">
+            {article.imageUrl && (
+              <figure className="article-image-wrap">
+                <img className="article-image" src={article.imageUrl} alt={article.title} />
+              </figure>
+            )}
+            {article.instagramEmbedUrl && (
+              <div className="article-instagram-wrap">
+                <iframe
+                  className="article-instagram-embed"
+                  src={article.instagramEmbedUrl}
+                  title={`Postingan Instagram: ${article.title}`}
+                  loading="lazy"
+                  allow="encrypted-media; picture-in-picture"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+              </div>
+            )}
+          </section>
         )}
         <div className="article-body">
           {article.content.split(/\n\s*\n/).map((paragraph, index) => (

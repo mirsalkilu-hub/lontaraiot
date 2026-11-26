@@ -53,6 +53,7 @@ function PartnerLogos() {
 function NewsSection({ news, error }) {
   const [search, setSearch] = useState("");
   const latestNews = news.slice(0, 6);
+  const instagramFeature = latestNews.find((item) => item.instagramEmbedUrl);
   const normalizedSearch = search.trim().toLocaleLowerCase("id-ID");
   const filteredNews = latestNews.filter((item) =>
     [item.title, item.category, item.excerpt, item.date]
@@ -76,6 +77,28 @@ function NewsSection({ news, error }) {
             onChange={(event) => setSearch(event.target.value)}
           />
         </div>
+      )}
+      {!error && instagramFeature && (
+        <aside className="instagram-featured" aria-label="Sorotan Instagram terbaru">
+          <div className="instagram-featured-copy">
+            <p className="eyebrow"><span className="eyebrow-line" /> INSTAGRAM / TERBARU</p>
+            <h3>{instagramFeature.title}</h3>
+            <p>{instagramFeature.excerpt}</p>
+            <a className="text-link" href={`/berita/${encodeURIComponent(instagramFeature.slug)}`}>
+              Baca berita lengkap <ArrowIcon />
+            </a>
+          </div>
+          <div className="instagram-featured-frame">
+            <iframe
+              src={`${instagramFeature.instagramEmbedUrl}?autoplay=1&mute=1`}
+              title={`Postingan Instagram: ${instagramFeature.title}`}
+              loading="lazy"
+              allow="autoplay; encrypted-media; picture-in-picture"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
+          </div>
+        </aside>
       )}
       {error ? <p className="empty-news" role="status">{error}</p> : latestNews.length ? filteredNews.length ? <div className="news-grid">
         {filteredNews.map((item, index) => (
